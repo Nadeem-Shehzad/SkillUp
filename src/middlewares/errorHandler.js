@@ -1,21 +1,33 @@
+import { NODE_ENV } from "../config/index.js";
+import { constants } from "../constants/statusCodes.js";
+
 
 export const customErrorHandler = (err, req, res, next) => {
    const statusCode = err.statusCode || 500;
+   const message = err.message || 'Something went wrong';
 
    res.status(statusCode);
 
    switch (statusCode) {
-      case 404:
-         res.json({ success: false, title: 'Not Found.', message: err.message });
+      case constants.VALIDATION_ERROR:
+         res.json({ success: false, title: 'Validation Error!', message });
          break;
-      case 400:
-         res.json({ success: false, title: 'Bad Request.', message: err.message });
+      case constants.UNAUTHORIZED:
+         res.json({ success: false, title: 'User is Unauthorized!', message });
          break;
-      case 500:
-         res.json({ success: false, title: 'Internal server error.', message: err.message });
+      case constants.NOT_FOUND:
+         res.json({ success: false, title: 'Not Found.', message });
          break;
-      default:
-         console.log('No Error, All good!');
+      case constants.FORBIDDEN:
+         res.json({ success: false, title: 'Access Denied!', message });
+         break;
+      default: // includes SERVER_ERROR or unexpected codes
+         res.json({
+            success: false,
+            title: 'Server Error!',
+            message,
+            ...(NODE_ENV === 'development' && { stack: err.stack }),
+         });
          break;
    }
 }

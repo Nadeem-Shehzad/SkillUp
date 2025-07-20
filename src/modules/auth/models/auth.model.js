@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
    email: {
       type: String,
       required: [true, 'Email is required'],
-      //unique: true,
+      unique: true,
       lowercase: true,
       trim: true,
    },
@@ -20,16 +20,22 @@ const userSchema = new mongoose.Schema({
    },
    role: {
       type: String,
-      enum: ['user', 'instructor', 'admin'],
-      default: 'user',
+      enum: ['student', 'instructor', 'admin'],
+      default: 'student',
    },
    isVerified: {
       type: Boolean,
       default: false,
    },
-   avatar: {
-      type: String, // URL or filename
-      default: '',
+   image: {
+      id: {
+         type: String,
+         default: ''
+      },
+      url: {
+         type: String,
+         default: ''
+      }
    },
    bio: {
       type: String,
