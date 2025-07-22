@@ -6,8 +6,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-//dotenv.config();
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+// Dynamically load .env or .env.test based on NODE_ENV
+// const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+// dotenv.config({ path: path.resolve(__dirname, `../../${envFile}`) });
 
 const {
     NODE_ENV,

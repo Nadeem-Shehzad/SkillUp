@@ -3,7 +3,7 @@ import { body } from "express-validator";
 
 export const register_validator = [
    body('name')
-      .notEmpty().withMessage('Name is ')
+      .notEmpty().withMessage('Name Required.')
       .trim()
       .isLength({ min: 2 }).withMessage('Min 2 chars required!')
       .isLength({ max: 18 }).withMessage('Max 18 chars allowed!')
@@ -11,10 +11,13 @@ export const register_validator = [
       .withMessage('Name must contain only letters'),
 
    body('email')
+      .notEmpty().withMessage('Email Required.')
       .isEmail().withMessage('Invalid Email'),
 
    body('password')
-      .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+      .notEmpty().withMessage('Password Required.') 
+      .isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+      .isLength({max: 18}).withMessage('Password maximum length 18 characters allowed'),
 ];
 
 

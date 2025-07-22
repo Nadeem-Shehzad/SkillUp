@@ -10,13 +10,13 @@ export const createUser = async (req) => {
    let imageUploadData = { id: '', url: '' };
 
    const { name, email, password } = req.body;
+  
+   if (await User.isEmailTaken({ email })) {
+      throw new ApiError(constants.VALIDATION_ERROR, 'Email Already Registered!');
+   }
 
    if (req.files && req.files.image) {
       imageUploadData = await imageUpload(req);
-   }
-
-   if (await User.isEmailTaken({ email })) {
-      throw new ApiError(constants.VALIDATION_ERROR, 'Email Already Registered!');
    }
 
    const hPassword = await hashPassword(password);
@@ -60,12 +60,22 @@ export const findLoginUser = async ({ id }) => {
 
 export const updatePassword = async (user, reqBody) => {
 
+   const matchOldPassword = await comparePassword(reqBody.oldPassword, user.password);
+   
+   if(!matchOldPassword){
+      throw new ApiError(constants.UNAUTHORIZED,'Incorrect Old Password.');
+   }
+
    const hashedPassword = await hashPassword(reqBody.password);
    reqBody.password = hashedPassword;
 
    const updatedUser = await User.findByIdAndUpdate(
       user._id,
-      reqBody,
+      {
+         $set:{
+            password: hashedPassword
+         }
+      },
       { new: true }
    );
 

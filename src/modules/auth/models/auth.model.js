@@ -46,10 +46,8 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.statics.isEmailTaken = async function ({ email }) {
-   if (await this.findOne({ email })) {
-      return true;
-   }
-}
+   return !!(await this.findOne({ email }));
+};
 
 const User = mongoose.model('User', userSchema);
 export default User;
