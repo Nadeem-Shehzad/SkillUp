@@ -1,10 +1,17 @@
 // File: tests/modules/auth/auth.test.js
 import request from 'supertest';
 import path from 'path';
-import { describe, it, beforeAll, expect, jest } from '@jest/globals';
+import {
+   describe,
+   it,
+   beforeAll,
+   expect,
+   jest,
+   afterAll
+} from '@jest/globals';
 
-import { testPOSTRequest } from '../../helpers/testRequest.js';
 import { registerAndLogin } from '../../helpers/auth/registerAndLogin.js';
+import redisClient from '../../../src/bullmq/connection.js';
 
 
 let app;
@@ -117,7 +124,7 @@ describe('update-password', () => {
 });
 
 
-describe.only('update-profile', () => {
+describe('update-profile', () => {
    it('Should update user profile.', async () => {
       const token = await registerAndLogin();
 
@@ -130,5 +137,102 @@ describe.only('update-profile', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe('User Profile Updated.');
       expect(res.body.data.name).toBe('John Cena');
+   });
+});
+
+
+describe('verify-email', () => {
+   it('should send account verification email.', async () => {
+      const res = await request(app)
+         .post('/api/auth/verify-email')
+         .send({ email: 'test@gmail.com' });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toBe('email sent!');
+   });
+});
+
+
+describe('verify-otp', () => {
+
+   const testEmail = 'test@gmail.om';
+   const testCode = '123456';
+
+   beforeAll(async () => {
+      await redisClient.set(`verify:${testEmail}`, testCode, 'EX', 300);
+   });
+
+   afterAll(async () => {
+      await redisClient.del(`verify:${testEmail}`);
+      await redisClient.quit();
+   });
+
+   it('should verify otp', async () => {
+      const res = await request(app)
+         .post('/api/auth/verify-otp')
+         .send({ email: testEmail, code: testCode });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toBe('Email verified successfully!');
+      expect(res.body.data).toBe(null);
+   });
+
+   it('should not verify otp', async () => {
+      const res = await request(app)
+         .post('/api/auth/verify-otp')
+         .send({ email: testEmail, code: '000000' });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.success).toBe(false);
+   });
+});
+
+
+describe('forgot-password', () => {
+
+   it('should send email to reset password.', async () => {
+
+      await registerAndLogin();
+      const testEmail = 'john@example.com';
+
+      const res = await request(app)
+         .post('/api/auth/forgot-password')
+         .send({ email: testEmail });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toBe('Please check your mail inbox. and reset your password!');
+   });
+});
+
+
+describe.only('reset-password', () => {
+   
+   const token = 'rqJUQrHnXCo8TL56IH3kP5PoAhVBiHyt';
+   const testEmail = 'john@example.com';
+   const password = '111111';
+
+   beforeAll(async()=>{
+      await redisClient.set(`forgotPassword:${testEmail}`,token, 'EX',300);
+   });
+   
+   afterAll(async ()=>{
+      await redisClient.del(`forgotPassword:${testEmail}`);
+      await redisClient.quit();
+   });
+
+   it('should send email to reset password.', async () => {
+
+      await registerAndLogin();
+
+      const res = await request(app)
+         .post(`/api/auth/reset-password?token=${token}`)
+         .send({ email: testEmail, newPassword: password });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toBe('Your Password has been reset.');
    });
 });

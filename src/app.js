@@ -4,6 +4,8 @@ import { customErrorHandler } from './middlewares/errorHandler.js';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 
+// load workers
+//import './bullmq/workerLoader.js';
 
 const app = express();
 

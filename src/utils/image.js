@@ -11,6 +11,7 @@ export const imageUpload = async (req) => {
          folder: "images"
       });
 
+      
       // check image is uploaded successfully or not
       if (result && result.secure_url) {
          const imageData = {
@@ -20,6 +21,9 @@ export const imageUpload = async (req) => {
          
          return imageData;
       }
-      return null;
+      return {
+         id: '',
+         url: ''
+      };
    }
 }
