@@ -8,7 +8,9 @@ import {
    verifyUserEmail,
    verifyUserEmailOTP,
    forgot_Password,
-   reset_Password
+   reset_Password,
+   handleRefreshToken,
+   handleLogout
 } from "../services/auth.services.js";
 
 
@@ -26,8 +28,9 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
    try {
       const user = await validateUser(req.body);
-      const token = generateToken(user);
-      res.status(200).json({ success: true, message: 'User LogedIn.', data: token });
+      const { accessToken, refreshToken } = await generateToken(user);
+
+      res.status(200).json({ success: true, message: 'User LogedIn.', data: { accessToken, refreshToken } });
 
    } catch (error) {
       next(error);
@@ -87,6 +90,40 @@ export const verifyOTP = async (req, res, next) => {
    try {
       await verifyUserEmailOTP(req.body);
       res.status(200).json({ success: true, message: 'Email verified successfully!', data: null });
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const refreshToken = async (req, res, next) => {
+   try {
+      const accessToken = await handleRefreshToken(req);
+      res.status(200).json({ success: true, message: 'New Access Token Generated.', data: accessToken });
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const logout = async (req, res, next) => {
+   try {
+      const isRDataDeleted = await handleLogout(req);
+
+      console.log(`isDeleted Key --> ${isRDataDeleted}`);
+
+      if (isRDataDeleted) {
+         res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'Strict'
+         });
+         
+         res.status(200).json({ success: true, message: 'User LogedOut.', data: null });
+      } else {
+         res.status(500).json({ success: false, message: 'Error while Logout!', data: null });
+      }
+
    } catch (error) {
       next(error);
    }

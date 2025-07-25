@@ -23,5 +23,8 @@ export const registerAndLogin = async ({
       .post('/api/auth/login')
       .send({ email, password });
 
-   return loginRes.body.data; // return token   
+   const accessToken = loginRes.body.data.accessToken;
+   const refreshToken = loginRes.body.data.refreshToken;
+
+   return { accessToken, refreshToken }; // return token   
 }

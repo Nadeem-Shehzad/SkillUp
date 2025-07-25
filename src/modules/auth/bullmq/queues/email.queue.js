@@ -1,6 +1,7 @@
 import { Queue } from 'bullmq';
-import connection from '../../../../bullmq/connection.js';
+import redisConnection from '../../../../config/index.js';
 
-export const welcomeEmailQueue = new Queue('emailQueue', {
-  connection
+
+export const mailQueue = new Queue('emailQueue', {
+  redisConnection
 });

@@ -1,11 +1,11 @@
 
-import { welcomeEmailQueue } from '../bullmq/queues/email.queue.js';
+import { mailQueue } from '../bullmq/queues/email.queue.js';
 
 export const addWelcomeEmailJob = async ({ to, subject, data }) => {
 
   // console.log('📥 Adding welcome email job to queue...');
 
-  await welcomeEmailQueue.add('sendEmail', { to, subject, data },
+  await mailQueue.add('sendEmail', { to, subject, data },
     {
       jobId: `${to}-${Date.now()}`,
       removeOnComplete: true,

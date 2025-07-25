@@ -1,13 +1,19 @@
 import express from 'express';
-import { authRoutes } from './modules/auth/index.js'
-import { customErrorHandler } from './middlewares/errorHandler.js';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
+import helmet from 'helmet';
+
+import { globalRateLimiter } from './middlewares/rateLimiters.js';
+import { authRoutes } from './modules/auth/index.js'
+import { customErrorHandler } from './middlewares/errorHandler.js';
 
 // load workers
 //import './bullmq/workerLoader.js';
 
 const app = express();
+
+app.use(helmet());
+app.use(globalRateLimiter);
 
 // to get temp files like images
 app.use(fileUpload({

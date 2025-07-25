@@ -4,9 +4,13 @@ import User from "../models/auth.model.js";
 import { constants } from "../../../constants/statusCodes.js";
 import { imageUpload } from "../../../utils/image.js";
 import { sendEmail } from "../../../utils/email.js";
-import redisClient from "../../../bullmq/connection.js";
+import { redis } from "../../../config/index.js";
 import randomstring from 'randomstring';
 import cloudinary from "../../../config/cloudinary.js";
+import { verifyToken } from "../../../utils/token.js";
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET, TOKEN_EXPIRES_IN } from "../../../config/env.js";
+
 
 
 
@@ -99,7 +103,7 @@ export const updateUserProfile = async (user, req) => {
       dataToUpdate.image = imageUploadData;
 
       // delete old image if exists
-      if(user.image?.id){
+      if (user.image?.id) {
          await cloudinary.uploader.destroy(
             user.image.id,
             { resource_type: "image", invalidate: true }
@@ -134,7 +138,7 @@ export const verifyUserEmail = async (reqBody) => {
       data: `<h3>Your verification code is: <b>${code}</b></h3>`
    });
 
-   await redisClient.setex(`verify:${email}`, 600, code);
+   await redis.setex(`verify:${email}`, 600, code);
 }
 
 
@@ -142,7 +146,7 @@ export const verifyUserEmailOTP = async (reqBody) => {
 
    const { email, code } = reqBody;
 
-   const storedCode = await redisClient.get(`verify:${email}`);
+   const storedCode = await redis.get(`verify:${email}`);
 
    if (!storedCode) {
       throw new ApiError(400, 'Code expired or not found');
@@ -152,9 +156,46 @@ export const verifyUserEmailOTP = async (reqBody) => {
       throw new ApiError(400, 'Invalid verification code');
    }
 
-   // here add logic to update user --> isVerified to -> true
+   const user = await User.findOne({ email });
+   if (!user) {
+      throw new ApiError(404, 'User not Found!');
+   }
 
-   await redisClient.del(`verify:${email}`);
+   user.isVerified = true;
+   await user.save();
+
+   await redis.del(`verify:${email}`);
+}
+
+
+export const handleRefreshToken = async (req) => {
+   const token = req.cookies.refreshToken;
+
+   if (!token) {
+      throw new ApiError(constants.UNAUTHORIZED, 'No Refresh Token');
+   }
+
+   const decoded = verifyToken(token);
+   const userId = decoded.user.id;
+
+   const storedRFToken = await redis.get(`rfToken:${userId}`);
+   if (!storedRFToken !== token) {
+      throw new ApiError(constants.VALIDATION_ERROR, 'Invalid refresh Token');
+   }
+
+   const accessToken = jwt.sign({
+      user: decoded.user
+   }, JWT_SECRET, { expiresIn: TOKEN_EXPIRES_IN });
+
+   return accessToken;
+}
+
+
+export const handleLogout = async (req) => {
+   const userId = req.user.id;
+   const deletedCount = await redis.del(`rfToken:${userId}`);
+
+   return deletedCount === 1;
 }
 
 
@@ -174,7 +215,7 @@ export const forgot_Password = async (reqBody) => {
 
    await sendEmail({ to: email, subject, data });
 
-   await redisClient.set(`forgotPassword:${email}`, ranString);
+   await redis.set(`forgotPassword:${email}`, ranString);
 }
 
 
@@ -193,7 +234,7 @@ export const reset_Password = async (req) => {
       throw new ApiError(404, 'Invalid Email to reset password');
    }
 
-   const storedToken = await redisClient.get(`forgotPassword:${email}`);
+   const storedToken = await redis.get(`forgotPassword:${email}`);
 
    if (storedToken !== token) {
       throw new ApiError(400, 'Invalid Token to reset password.');

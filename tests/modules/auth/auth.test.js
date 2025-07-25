@@ -11,7 +11,11 @@ import {
 } from '@jest/globals';
 
 import { registerAndLogin } from '../../helpers/auth/registerAndLogin.js';
-import redisClient from '../../../src/bullmq/connection.js';
+import { redis } from '../../../src/config/index.js';
+import jwt from 'jsonwebtoken';
+import User from '../../../src/modules/auth/models/auth.model.js';
+import mongoose from 'mongoose';
+
 
 
 let app;
@@ -19,6 +23,7 @@ let app;
 beforeAll(async () => {
    app = (await import('../../../src/app.js')).default;
 });
+
 
 describe('register', () => {
    jest.setTimeout(15_000); // to allow image upload and DB interaction
@@ -83,21 +88,21 @@ describe('login', () => {
 
    it('should login user and return token', async () => {
 
-      const token = await registerAndLogin({ email, password });
+      const { accessToken, refreshToken } = await registerAndLogin({ email, password });
 
-      expect(typeof token).toBe('string');
-      expect(token.length).toBeGreaterThan(10);
+      expect(typeof accessToken).toBe('string');
+      expect(accessToken.length).toBeGreaterThan(10);
    });
 });
 
 
 describe('me', () => {
    it('should return user info when token is valid.', async () => {
-      const token = await registerAndLogin();
+      const { accessToken, refreshToken } = await registerAndLogin();
 
       const res = await request(app)
          .get('/api/auth/me')
-         .set('Authorization', `Bearer ${token}`);
+         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
@@ -110,11 +115,11 @@ describe('me', () => {
 
 describe('update-password', () => {
    it('Should update password.', async () => {
-      const token = await registerAndLogin();
+      const { accessToken, refreshToken } = await registerAndLogin();
 
       const res = await request(app)
          .put('/api/auth/change-password')
-         .set('Authorization', `Bearer ${token}`)
+         .set('Authorization', `Bearer ${accessToken}`)
          .send({ oldPassword: '12345678', password: '112233' });
 
       expect(res.statusCode).toBe(200);
@@ -126,11 +131,11 @@ describe('update-password', () => {
 
 describe('update-profile', () => {
    it('Should update user profile.', async () => {
-      const token = await registerAndLogin();
+      const { accessToken, refreshToken } = await registerAndLogin();
 
       const res = await request(app)
          .put('/api/auth/update-profile')
-         .set('Authorization', `Bearer ${token}`)
+         .set('Authorization', `Bearer ${accessToken}`)
          .send({ name: 'John Cena' });
 
       expect(res.statusCode).toBe(200);
@@ -154,18 +159,31 @@ describe('verify-email', () => {
 });
 
 
-describe('verify-otp', () => {
+describe.only('verify-otp', () => {
 
-   const testEmail = 'test@gmail.om';
+   const testEmail = 'test@gmail.com';
    const testCode = '123456';
 
    beforeAll(async () => {
-      await redisClient.set(`verify:${testEmail}`, testCode, 'EX', 300);
+      await User.deleteMany({});
+      await redis.del(`verify:${testEmail}`);
+
+      const createdUser = await User.create({
+         name: 'Test User',
+         email: testEmail,
+         password: '123456',
+         isVerified: false,
+      });
+
+      console.log('Inserted Test User:', createdUser);
+
+      await redis.set(`verify:${testEmail}`, testCode, 'EX', 300);
    });
 
    afterAll(async () => {
-      await redisClient.del(`verify:${testEmail}`);
-      await redisClient.quit();
+      await redis.del(`verify:${testEmail}`);
+      await User.deleteMany({});
+      await mongoose.connection.close(); 
    });
 
    it('should verify otp', async () => {
@@ -173,13 +191,23 @@ describe('verify-otp', () => {
          .post('/api/auth/verify-otp')
          .send({ email: testEmail, code: testCode });
 
+      console.log('🧪 API Response:', res.body);
+
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe('Email verified successfully!');
       expect(res.body.data).toBe(null);
+
+      const updatedUser = await User.findOne({ email: testEmail });
+      expect(updatedUser.isVerified).toBe(true);
+
+      const redisKey = await redis.get(`verify:${testEmail}`);
+      expect(redisKey).toBeNull();
    });
 
-   it('should not verify otp', async () => {
+   it('should not verify otp (wrong code)', async () => {
+      await redis.set(`verify:${testEmail}`, testCode, 'EX', 300);
+
       const res = await request(app)
          .post('/api/auth/verify-otp')
          .send({ email: testEmail, code: '000000' });
@@ -208,19 +236,19 @@ describe('forgot-password', () => {
 });
 
 
-describe.only('reset-password', () => {
-   
+describe('reset-password', () => {
+
    const token = 'rqJUQrHnXCo8TL56IH3kP5PoAhVBiHyt';
    const testEmail = 'john@example.com';
    const password = '111111';
 
-   beforeAll(async()=>{
-      await redisClient.set(`forgotPassword:${testEmail}`,token, 'EX',300);
+   beforeAll(async () => {
+      await redis.set(`forgotPassword:${testEmail}`, token, 'EX', 300);
    });
-   
-   afterAll(async ()=>{
-      await redisClient.del(`forgotPassword:${testEmail}`);
-      await redisClient.quit();
+
+   afterAll(async () => {
+      await redis.del(`forgotPassword:${testEmail}`);
+      //await redis.quit();
    });
 
    it('should send email to reset password.', async () => {
@@ -234,5 +262,39 @@ describe.only('reset-password', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe('Your Password has been reset.');
+   });
+});
+
+
+describe('logout', () => {
+
+   let userId;
+   let token;
+
+   beforeAll(async () => {
+      const { accessToken, refreshToken } = await registerAndLogin();
+      token = accessToken;
+      const decoded = jwt.decode(accessToken);
+      userId = decoded.user.id;
+      await redis.set(`rfToken:${userId}`, refreshToken, "EX", 300);
+   });
+
+   afterAll(async () => {
+      await redis.del(`rfToken:${userId}`);
+      //await redis.quit();
+   });
+
+   it('should logout user', async () => {
+
+      const res = await request(app)
+         .post('/api/auth/logout')
+         .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toBe('User LogedOut.');
+
+      const redisData = await redis.get(`rfToken:${userId}`);
+      expect(redisData).toBeNull();
    });
 });

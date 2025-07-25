@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 
-const connection = new Redis({
+const redis = new Redis({
   host: 'redis-19673.c100.us-east-1-4.ec2.redns.redis-cloud.com',
   port: 19673,
   username: 'default',
@@ -8,13 +8,13 @@ const connection = new Redis({
   maxRetriesPerRequest: null
 });
 
-connection.on('connect', () => {
+redis.on('connect', () => {
   console.log('✅ Connected to Redis Cloud via TLS');
 });
 
-connection.on('error', (err) => {
+redis.on('error', (err) => {
   console.error('❌ ioredis error:', err);
 });
 
 
-export default connection;
+export default redis;
