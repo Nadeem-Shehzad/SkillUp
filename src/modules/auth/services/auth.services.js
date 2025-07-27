@@ -6,10 +6,10 @@ import { imageUpload } from "../../../utils/image.js";
 import { sendEmail } from "../../../utils/email.js";
 import { redis } from "../../../config/index.js";
 import randomstring from 'randomstring';
-import cloudinary from "../../../config/cloudinary.js";
 import { verifyToken } from "../../../utils/token.js";
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET, TOKEN_EXPIRES_IN } from "../../../config/env.js";
+import { Student } from "../../student/models/student.model.js";
 
 
 
@@ -18,7 +18,12 @@ export const createUser = async (req) => {
 
    let imageUploadData = { id: '', url: '' };
 
-   const { name, email, password } = req.body;
+   const { name, email, password, role } = req.body;
+
+   const allowedRoles = ['student', 'instructor'];
+   if (!allowedRoles.includes(role)) {
+      throw new ApiError(constants.FORBIDDEN, 'Invalid role to register!')
+   }
 
    if (await User.isEmailTaken({ email })) {
       throw new ApiError(constants.VALIDATION_ERROR, 'Email Already Registered!');
@@ -36,6 +41,10 @@ export const createUser = async (req) => {
       role: 'student',
       image: imageUploadData
    });
+
+   if (user.role === 'student') {
+      await Student.create({ user: user._id });
+   }
 
    return user;
 }
@@ -56,7 +65,6 @@ export const validateUser = async ({ email, password }) => {
    return user;
 }
 
-
 export const findLoginUser = async ({ id }) => {
    const user = await User.findById(id);
    if (!user) {
@@ -65,7 +73,6 @@ export const findLoginUser = async ({ id }) => {
 
    return user;
 }
-
 
 export const updatePassword = async (user, reqBody) => {
 
@@ -85,35 +92,6 @@ export const updatePassword = async (user, reqBody) => {
             password: hashedPassword
          }
       },
-      { new: true }
-   );
-
-   return updatedUser;
-}
-
-
-export const updateUserProfile = async (user, req) => {
-
-   const dataToUpdate = req.body;
-
-   if (req.files && req.files.image) {
-
-      const imageUploadData = await imageUpload(req);
-
-      dataToUpdate.image = imageUploadData;
-
-      // delete old image if exists
-      if (user.image?.id) {
-         await cloudinary.uploader.destroy(
-            user.image.id,
-            { resource_type: "image", invalidate: true }
-         );
-      }
-   }
-
-   const updatedUser = await User.findByIdAndUpdate(
-      user._id,
-      dataToUpdate,
       { new: true }
    );
 

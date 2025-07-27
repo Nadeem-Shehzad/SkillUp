@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
    },
    role: {
       type: String,
-      enum: ['student', 'instructor', 'admin'],
+      enum: ['student', 'instructor'],
       default: 'student',
    },
    isVerified: {
@@ -36,11 +36,7 @@ const userSchema = new mongoose.Schema({
          type: String,
          default: ''
       }
-   },
-   bio: {
-      type: String,
-      default: '',
-   },
+   }
 }, {
    timestamps: true,
 });
@@ -48,6 +44,11 @@ const userSchema = new mongoose.Schema({
 userSchema.statics.isEmailTaken = async function ({ email }) {
    return !!(await this.findOne({ email }));
 };
+
+// apply indexing
+// userSchema.index({ email: 1 }, { unique: true });
+// userSchema.index({ role: 1 });
+// userSchema.index({ email: 1 }, { isVerified: 1 });
 
 const User = mongoose.model('User', userSchema);
 export default User;

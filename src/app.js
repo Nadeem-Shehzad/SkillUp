@@ -4,7 +4,8 @@ import fileUpload from 'express-fileupload';
 import helmet from 'helmet';
 
 import { globalRateLimiter } from './middlewares/rateLimiters.js';
-import { authRoutes } from './modules/auth/index.js'
+import { authRoutes } from './modules/auth/index.js';
+import { studentRoutes } from './modules/student/index.js';
 import { customErrorHandler } from './middlewares/errorHandler.js';
 
 // load workers
@@ -25,6 +26,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/student', studentRoutes);
 
 app.use(customErrorHandler);
 

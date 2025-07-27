@@ -159,7 +159,7 @@ describe('verify-email', () => {
 });
 
 
-describe.only('verify-otp', () => {
+describe('verify-otp', () => {
 
    const testEmail = 'test@gmail.com';
    const testCode = '123456';

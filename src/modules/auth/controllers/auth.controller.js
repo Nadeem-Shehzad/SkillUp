@@ -2,7 +2,6 @@ import { generateToken } from "../../../utils/token.js";
 import {
    createUser,
    findLoginUser,
-   updateUserProfile,
    updatePassword,
    validateUser,
    verifyUserEmail,
@@ -31,31 +30,6 @@ export const login = async (req, res, next) => {
       const { accessToken, refreshToken } = await generateToken(user);
 
       res.status(200).json({ success: true, message: 'User LogedIn.', data: { accessToken, refreshToken } });
-
-   } catch (error) {
-      next(error);
-   }
-}
-
-
-export const me = async (req, res, next) => {
-   try {
-      const user = await findLoginUser(req.user);
-
-      res.status(200).json({ success: true, message: 'Current User', data: user });
-
-   } catch (error) {
-      next(error);
-   }
-}
-
-
-export const updateProfile = async (req, res, next) => {
-   try {
-      const user = await findLoginUser(req.user);
-      const updatedUser = await updateUserProfile(user, req);
-
-      res.status(200).json({ success: true, message: 'User Profile Updated.', data: updatedUser });
 
    } catch (error) {
       next(error);
