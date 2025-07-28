@@ -10,6 +10,7 @@ import { verifyToken } from "../../../utils/token.js";
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET, TOKEN_EXPIRES_IN } from "../../../config/env.js";
 import { Student } from "../../student/models/student.model.js";
+import { Instructor } from "../../instructor/models/instructor.model.js";
 
 
 
@@ -38,12 +39,16 @@ export const createUser = async (req) => {
       name,
       email,
       password: hPassword,
-      role: 'student',
+      role,
       image: imageUploadData
    });
 
    if (user.role === 'student') {
       await Student.create({ user: user._id });
+   }
+
+   if (user.role === 'instructor') {
+      await Instructor.create({ user: user._id });
    }
 
    return user;

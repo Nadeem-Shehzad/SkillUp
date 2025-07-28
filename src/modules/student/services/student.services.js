@@ -35,6 +35,10 @@ export const updateUserProfile = async (user, req) => {
    const { name, email, educationLevel, language, learningGoal, bio } = req.body;
    const student = await Student.findOne({ user: user._id });
 
+   if(!student){
+      throw new ApiError(constants.NOT_FOUND, 'Student Not Found!');
+   }
+
    // update user-auth module
    const dataToUpdate = {}
    if (name) dataToUpdate.name = name;
@@ -66,8 +70,10 @@ export const updateUserProfile = async (user, req) => {
    if (learningGoal) updateData['preferences.learningGoal'] = learningGoal;
    if (language) updateData['preferences.language'] = language;
 
-   await Student.findByIdAndUpdate(
-      student._id,
-      updateData
-   );
+   if(Object.keys(updateData).length > 0){
+      await Student.findByIdAndUpdate(
+         student._id,
+         updateData
+      );
+   }
 }

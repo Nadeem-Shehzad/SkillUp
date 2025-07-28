@@ -2,28 +2,28 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/index.js';
 import ApiError from '../utils/apiError.js';
 import { constants } from '../constants/statusCodes.js';
+import User from '../modules/auth/models/auth.model.js';
 
 
 export const ValidateToken = async (req, res, next) => {
-   let token;
 
-   let authHeader = req.headers.Authorization || req.headers.authorization;
-   if (authHeader && authHeader.startsWith('Bearer')) {
-      token = authHeader.split(' ')[1];
+   const token = req.headers.authorization?.split(" ")[1];
 
-      jwt.verify(token, JWT_SECRET, (err, decode) => {
-         if (err) {
-            throw new ApiError(constants.UNAUTHORIZED, 'User not Authorized');
-         }
+   if (!token) {
+      throw new ApiError(constants.UNAUTHORIZED, "No token provided");
+   }
 
-         req.user = decode.user;
-         next();
-      });
+   try {
+      const decoded = jwt.verify(token, JWT_SECRET);
 
-      if (!token) {
-         throw new ApiError(constants.VALIDATION_ERROR, 'User is not authorized or token is missing!');
+      const user = await User.findById(decoded.user.id);
+      if (!user) {
+         throw new ApiError(constants.UNAUTHORIZED, "Invalid Token");
       }
-   } else {
-      throw new ApiError(constants.VALIDATION_ERROR,'Token Providing Error');
+
+      req.user = decoded.user;
+      next();
+   } catch (err) {
+      return res.status(401).json({ message: "Token verification failed" });
    }
 }

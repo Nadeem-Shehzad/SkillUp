@@ -11,7 +11,8 @@ export const generateToken = async (user) => {
          user: {
             username: user.name,
             email: user.email,
-            id: user._id
+            id: user._id,
+            role: user.role
          }
       }, JWT_SECRET, { expiresIn: RF_TOKEN_EXPIRES_IN });
       await redis.set(`rfToken:${user._id}`, refreshToken, 'EX', 604800);
@@ -21,7 +22,8 @@ export const generateToken = async (user) => {
       user: {
          username: user.name,
          email: user.email,
-         id: user._id
+         id: user._id,
+         role: user.role
       }
    }, JWT_SECRET, { expiresIn: TOKEN_EXPIRES_IN });
 
