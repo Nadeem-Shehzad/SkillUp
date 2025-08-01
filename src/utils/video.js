@@ -1,29 +1,30 @@
+
 import cloudinary from "../config/cloudinary.js"
 
 
-export const imageUpload = async (imagePath) => {
-   if (imagePath) {
+export const videoUpload = async (videoPath) => {
+   if (videoPath) {
 
-      const result = await cloudinary.uploader.upload(imagePath.tempFilePath, {
+      const result = await cloudinary.uploader.upload(videoPath.tempFilePath, {
          public_id: `${Date.now()}`,
-         resource_type: "auto",
-         folder: "images"
+         resource_type: "video",
+         folder: "videos"
       });
       
       // check image is uploaded successfully or not
       if (result && result.secure_url) {
-         const imageData = {
+         const videoData = {
             id: result.public_id,
             url: result.secure_url
          }
          
-         return imageData;
+         return videoData;
       }
       return {
          id: '',
          url: ''
       };
    } else {
-      console.log(`Image: Image Path missing!.`);
+      console.log(`Video: Video Path missing!.`);
    }
 }

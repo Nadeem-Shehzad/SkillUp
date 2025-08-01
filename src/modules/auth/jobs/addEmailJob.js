@@ -1,9 +1,9 @@
 
 import { mailQueue } from '../bullmq/queues/email.queue.js';
 
-export const addWelcomeEmailJob = async ({ to, subject, data }) => {
+export const addEmailJob = async ({ to, subject, data }) => {
 
-  // console.log('📥 Adding welcome email job to queue...');
+  console.log('📥 Adding email job to queue...');
 
   await mailQueue.add('sendEmail', { to, subject, data },
     {
@@ -15,5 +15,5 @@ export const addWelcomeEmailJob = async ({ to, subject, data }) => {
   // const jobCounts = await welcomeEmailQueue.getJobCounts();
   // console.log('📊 Job counts:', jobCounts);
 
-  // console.log('✅ Job added to welcome email queue');
+  console.log('✅ Job added to email queue');
 };

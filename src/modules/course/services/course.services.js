@@ -1,4 +1,11 @@
-import { Course } from "../models/course.model.js"
+import { Course } from "../models/course.model.js";
+import { addImageUploadJob } from "../bullmq/jobs/image.job.js";
+import { CourseContent } from "../models/courseContent.model.js";
+import ApiError from "../../../utils/apiError.js";
+import { constants } from "../../../constants/statusCodes.js";
+import { videoUpload } from "../../../utils/video.js";
+import { addVideoUploadJob } from "../bullmq/jobs/video.job.js";
+
 
 
 export const allCourses = async () => {
@@ -8,9 +15,11 @@ export const allCourses = async () => {
 
 
 export const createCourse = async (req) => {
-   const {
+
+   //let thumbnailData = { id: '', url: '' };
+
+   let {
       title,
-      slug,
       description,
       category,
       level,
@@ -23,11 +32,18 @@ export const createCourse = async (req) => {
       isPublished
    } = req.body;
 
-   const content = req.body.content ? JSON.parse(req.body.content): [];
+   // if (req.files && req.files.image) {
+   //    thumbnailData = await imageUpload(req);
+   // }
+
+   if (discount > 0) {
+      price = price - (price * discount / 100);
+   }
 
    const course = await Course.create({
       title,
       description,
+      //thumbnail: thumbnailData,
       category,
       level,
       price,
@@ -35,10 +51,44 @@ export const createCourse = async (req) => {
       tags,
       language,
       totalLectures,
-      content,
       instructor,
       isPublished,
    });
 
+   await addImageUploadJob({
+      imagePath: req.files.image,
+      courseId: course._id
+   });
+
    return course;
+}
+
+
+export const addCourseContents = async (req) => {
+
+   const { courseId, title, duration, isFree, order } = req.body;
+
+   const course = await Course.findById(courseId);
+   if (!course) {
+      throw new ApiError(constants.NOT_FOUND, 'Course To add content not Found!');
+   }
+
+   if (req.user.id.toString() !== course.instructor.toString()) {
+      throw new ApiError(constants.FORBIDDEN, 'Access Denied.');
+   }
+
+   const courseContent = await CourseContent.create({
+      courseId,
+      title,
+      duration,
+      isFree,
+      order
+   });
+   
+   const videoData = await addVideoUploadJob({
+      videoPath: req.files.video,
+      contentId: courseContent._id
+   });
+
+   return courseContent;
 }

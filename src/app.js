@@ -12,7 +12,7 @@ import { courseRoutes } from './modules/course/index.js';
 import { customErrorHandler } from './middlewares/errorHandler.js';
 
 // load workers
-//import './bullmq/workerLoader.js';
+import './bullmq/workerLoader.js';
 
 const app = express();
 

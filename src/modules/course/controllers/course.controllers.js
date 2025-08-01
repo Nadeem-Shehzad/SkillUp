@@ -1,4 +1,4 @@
-import { allCourses, createCourse } from "../services/course.services.js";
+import { allCourses, createCourse, addCourseContents } from "../services/course.services.js";
 
 
 export const getAllCourses = async (req, res, next) => {
@@ -17,7 +17,20 @@ export const addCourse = async (req, res, next) => {
 
       const course = await createCourse(req);
 
-      res.status(200).json({ success: true, message: 'Course created Successfully.', data: course });
+      res.status(201).json({ success: true, message: 'Course created Successfully.', data: course });
+
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const addCourseContent = async (req, res, next) => {
+   try {
+
+      const content = await addCourseContents(req);
+
+      res.status(201).json({ success: true, message: 'Course content added.', data: content });
 
    } catch (error) {
       next(error);

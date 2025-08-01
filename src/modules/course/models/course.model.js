@@ -1,4 +1,16 @@
 import mongoose from 'mongoose';
+import slugify from 'slugify';
+
+const thumbnailSchema = {
+   id: {
+      type: String,
+      default: ''
+   },
+   url: {
+      type: String,
+      default: ''
+   }
+}
 
 const courseSchema = new mongoose.Schema(
    {
@@ -16,16 +28,7 @@ const courseSchema = new mongoose.Schema(
          type: String,
          required: true,
       },
-      thumbnail: {
-         id: {
-            type: String,
-            default: ''
-         },
-         url: {
-            type: String,
-            default: ''
-         }
-      },
+      thumbnail: thumbnailSchema,
       category: {
          type: String,
          required: true,
@@ -53,14 +56,6 @@ const courseSchema = new mongoose.Schema(
          type: Number,
          default: 0,
       },
-      content: [
-         {
-            title: String,
-            videoUrl: String,
-            duration: String,
-            isFree: Boolean, // preview video access
-         },
-      ],
       instructor: {
          type: mongoose.Schema.Types.ObjectId,
          ref: 'Instructor',
@@ -84,6 +79,14 @@ const courseSchema = new mongoose.Schema(
    },
    { timestamps: true }
 );
+
+courseSchema.pre('save', function (next) {
+   if (this.isModified('title')) {
+      this.slug = slugify(this.title, { lower: true, strict: true });
+   }
+
+   next();
+});
 
 courseSchema.index({ slug: 1 });
 courseSchema.index({ instructor: 1 });

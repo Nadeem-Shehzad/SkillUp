@@ -1,21 +1,21 @@
 // src/modules/auth/bullmq/workers/welcomeEmail.worker.js
 import { Worker } from 'bullmq';
-import redisConnection from '../../../../config/index.js';
+import { redis } from '../../../../config/index.js';
 import { sendEmail } from '../../../../utils/email.js';
 
 //console.log('🧠 Email worker file executing...');
 
 const emailWorker = new Worker('emailQueue', async job => {
     const { to, subject, data } = job.data;
-    //console.log(`👷 Worker: Sending welcome email to <${to}>`);
+    console.log(`👷 Worker: Sending email to <${to}>`);
     // Simulate processing delay
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 3000));
     await sendEmail({ to, subject, data }); // <-- send email to user
 
-    //console.log(`✅ Worker: Welcome email sent to ${to}`);
+    console.log(`✅ Worker: email sent to ${to}`);
   },
-  { redisConnection }
+  { connection: redis }
 );
 
 // console.log('⚙️ Worker instance created:', welcomeEmailWorker.name);

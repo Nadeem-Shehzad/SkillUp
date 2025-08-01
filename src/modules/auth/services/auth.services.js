@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET, TOKEN_EXPIRES_IN } from "../../../config/env.js";
 import { Student } from "../../student/models/student.model.js";
 import { Instructor } from "../../instructor/models/instructor.model.js";
+import {addEmailJob} from '../jobs/addEmailJob.js'
 
 
 
@@ -108,18 +109,18 @@ export const verifyUserEmail = async (reqBody) => {
    const { email } = reqBody;
    const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-   // use this if want to send email by BullMQ service 
-   // await addWelcomeEmailJob({
-   //    to: email,
-   //    subject: 'Verify your SkillUp account',
-   //    data: `<h3>Your verification code is: <b>${code}</b></h3>`, // Or use template
-   // });
-
-   await sendEmail({
+   //use this if want to send email by BullMQ service 
+   await addEmailJob({
       to: email,
       subject: 'Verify your SkillUp account',
-      data: `<h3>Your verification code is: <b>${code}</b></h3>`
+      data: `<h3>Your verification code is: <b>${code}</b></h3>`, // Or use template
    });
+
+   // await sendEmail({
+   //    to: email,
+   //    subject: 'Verify your SkillUp account',
+   //    data: `<h3>Your verification code is: <b>${code}</b></h3>`
+   // });
 
    await redis.setex(`verify:${email}`, 600, code);
 }
