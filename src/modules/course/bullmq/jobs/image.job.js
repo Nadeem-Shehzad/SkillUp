@@ -1,4 +1,4 @@
-import { imageQueue } from "../queues/image.queue.js";
+import { imageQueue, imageUpdateQueue } from "../queues/image.queue.js";
 
 
 export const addImageUploadJob = async ({ imagePath, courseId }) => {
@@ -22,3 +22,20 @@ export const addImageUploadJob = async ({ imagePath, courseId }) => {
 
    console.log('✅ Job added to image queue');
 };
+
+
+export const addImageUpdateJob = async ({ newImagePath, oldImagePID, courseId }) => {
+   
+   console.log('📥 Adding imageUpdate job to queue...');
+   await imageUpdateQueue.add('UpdateImage', { newImagePath, oldImagePID, courseId }, {
+      attempts: 3,
+      backoff: {
+         type: 'exponential',
+         delay: 2000
+      },
+      removeOnComplete: true,
+      removeOnFail: false,
+   });
+
+    console.log('✅ Job added to imageUpdate queue');
+}

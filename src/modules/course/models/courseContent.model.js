@@ -12,7 +12,7 @@ const contentSchema = new mongoose.Schema(
          id: { type: String, default: '' },
          url: { type: String, default: '' },
       },
-      duration: { type: String },
+      duration: { type: String, required: true },
       isFree: { type: Boolean, default: false },
       order: { type: Number, default: 0 }, 
    },

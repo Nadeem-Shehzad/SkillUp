@@ -32,7 +32,9 @@ export const createUser = async (req) => {
    }
 
    if (req.files && req.files.image) {
-      imageUploadData = await imageUpload(req);
+      console.log('inside register...');
+      const imagePath = req.files.image;
+      imageUploadData = await imageUpload(imagePath);
    }
 
    const hPassword = await hashPassword(password);
