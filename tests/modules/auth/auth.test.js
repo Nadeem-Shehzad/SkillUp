@@ -17,7 +17,6 @@ import User from '../../../src/modules/auth/models/auth.model.js';
 import mongoose from 'mongoose';
 
 
-
 let app;
 
 beforeAll(async () => {

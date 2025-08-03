@@ -19,6 +19,7 @@ const {
     JWT_SECRET,
     TOKEN_EXPIRES_IN,
     RF_TOKEN_EXPIRES_IN,
+    REDIS_DATA_EXPIRY_TIME,
     CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET,
@@ -34,6 +35,7 @@ if (!MONGO_URI) throw new Error('MONGO_URI is required in .env');
 if (!JWT_SECRET) throw new Error('JWT_SECRET is required in .env');
 if (!TOKEN_EXPIRES_IN) throw new Error('TOKEN_EXPIRES_IN is required in .env');
 if (!RF_TOKEN_EXPIRES_IN) throw new Error('RF_TOKEN_EXPIRES_IN is required in .env');
+if (!REDIS_DATA_EXPIRY_TIME) throw new Error('REDIS_DATA_EXPIRY_TIME is required in .env');
 if (!CLOUDINARY_CLOUD_NAME) throw new Error('CLOUDINARY_CLOUD_NAME is required in .env');
 if (!CLOUDINARY_API_KEY) throw new Error('CLOUDINARY_API_KEY is required in .env');
 if (!CLOUDINARY_API_SECRET) throw new Error('CLOUDINARY_API_SECRET is required in .env');
@@ -49,6 +51,7 @@ export {
     JWT_SECRET,
     TOKEN_EXPIRES_IN,
     RF_TOKEN_EXPIRES_IN,
+    REDIS_DATA_EXPIRY_TIME,
     CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET,

@@ -6,12 +6,24 @@ import { constants } from "../../../constants/statusCodes.js";
 import { addVideoUpdateJob, addVideoUploadJob } from "../bullmq/jobs/video.job.js";
 import { Instructor } from "../../instructor/models/instructor.model.js";
 import { deleteVideo } from "../../../utils/video.js";
-import { runInTransaction } from "../../../config/index.js";
+import { redis, REDIS_DATA_EXPIRY_TIME, runInTransaction } from "../../../config/index.js";
 
 
 
-export const allCourses = async () => {
-   const courses = await Course.find({});
+export const allCourses = async ({ page, limit }) => {
+
+   let key = `allcourses:${page}:${limit}`;
+   const cachedData = await redis.get(key);
+
+   if (cachedData) {
+      console.log('data coming from redis');
+      return JSON.parse(cachedData);
+   }
+
+   const courses = await Course.find({}).skip((page - 1) * limit).limit(limit);
+
+   await redis.set(key, JSON.stringify(courses), 'EX', REDIS_DATA_EXPIRY_TIME);
+
    return courses;
 }
 
@@ -66,14 +78,163 @@ export const createCourse = async (req) => {
 }
 
 
-export const allInstructors = async () => {
-   const instructors = await Instructor.find({}).populate('user', 'name email isVerified');
+export const searchCourseService = async ({ searchQuery, page, limit }) => {
+
+   if (!searchQuery || searchQuery.trim() === '') return [];
+
+   const trimmedQuery = searchQuery.trim();
+   const isMultiWord = trimmedQuery.includes(' ') && trimmedQuery.length > 5;
+
+   let courses = [];
+
+   if (isMultiWord) {
+      const textFilter = { $text: { $search: `"${trimmedQuery}"` } };
+      const projection = { score: { $meta: 'textScore' } };
+
+      courses = await Course.find(textFilter, projection).sort({ score: { $meta: 'textScore' } })
+         .skip((page - 1) * limit).limit(limit);
+
+      if (!courses.length) {
+         const regexFilter = { title: { $regex: trimmedQuery, $options: 'i' } };
+         courses = await Course.find(regexFilter).skip((page - 1) * limit).limit(limit);
+      }
+   } else {
+      const regexFilter = { title: { $regex: trimmedQuery, $options: 'i' } };
+      courses = await Course.find(regexFilter).skip((page - 1) * limit).limit(limit);
+   }
+
+   return courses;
+}
+
+
+export const searchContentsService = async ({ searchQuery, courseId, page, limit }) => {
+   if (!searchQuery || typeof searchQuery !== 'string' || !searchQuery.trim()) return [];
+   if (!courseId) return [];
+
+   const query = searchQuery.trim();
+
+   const contents = await CourseContent.find({
+      $and: [
+         { courseId },
+         {
+            title: {
+               $regex: query,
+               $options: 'i'
+            }
+         }
+      ]
+   }).skip((page - 1) * limit).limit(limit);
+
+   return contents;
+}
+
+
+export const searchByInstructorService = async ({ searchQuery, page, limit }) => {
+
+   if (!searchQuery || typeof searchQuery !== 'string' || !searchQuery.trim()) return [];
+   const query = searchQuery.trim();
+
+   const skip = (page - 1) * limit;
+
+   const instructor = await Course.aggregate([
+      {
+         $lookup: {
+            from: 'instructors',
+            localField: 'instructor',
+            foreignField: 'user',
+            as: 'instructor'
+         },
+      },
+
+      { $unwind: '$instructor' },
+
+      {
+         $lookup: {
+            from: 'users',
+            localField: 'instructor.user',
+            foreignField: '_id',
+            as: 'user'
+         }
+      },
+
+      { $unwind: '$user' },
+
+      {
+         $match: {
+            'user.name': { $regex: query, $options: 'i' }
+         }
+      },
+
+      { $skip: skip },
+      { $limit: limit },
+
+      {
+         $project: {
+            title: 1,
+            instructorName: '$user.name',
+            category: 1
+         }
+      }
+
+   ]);
+
+   return instructor;
+}
+
+
+export const searchTagsService = async ({ searchQuery, page, limit }) => {
+   if (!searchQuery || typeof searchQuery !== 'string' || !searchQuery.trim()) return [];
+
+   const query = searchQuery.trim();
+
+   const courses = await Course.find({ tags: { $in: query } }).skip((page - 1) * limit).limit(limit);
+
+   return courses;
+}
+
+
+export const searchCategoryService = async ({ searchQuery, page, limit }) => {
+   if (!searchQuery || typeof searchQuery !== 'string' || !searchQuery.trim()) return [];
+
+   const query = searchQuery.trim();
+
+   const courses = await Course.find({ category: query }).skip((page - 1) * limit).limit(limit);
+
+   return courses;
+}
+
+
+export const allInstructors = async ({ page, limit }) => {
+   const key = `all-instructors:${page}:${limit}`;
+   const cachedData = await redis.get(key);
+
+   if (cachedData) {
+      console.log('data coming from redis...');
+      return JSON.parse(cachedData);
+   }
+
+   const instructors = await Instructor.find({})
+      .populate('user', 'name email isVerified')
+      .skip((page - 1) * limit).limit(limit);
+
+   await redis.set(key, JSON.stringify(instructors), 'EX', REDIS_DATA_EXPIRY_TIME);
    return instructors;
 }
 
 
-export const singleInstructorCourses = async ({ instructorId }) => {
-   const courses = await Course.find({ instructor: instructorId });
+export const singleInstructorCourses = async ({ instructorId, page, limit }) => {
+   const key = `courses-${instructorId}:${page}:${limit}`;
+   const cachedData = await redis.get(key);
+
+   if (cachedData) {
+      console.log('data coming from redis...');
+      return JSON.parse(cachedData);
+   }
+
+   const courses = await Course.find({ instructor: instructorId })
+      .skip((page - 1) * limit).limit(limit);
+
+   await redis.set(key, JSON.stringify(courses), 'EX', REDIS_DATA_EXPIRY_TIME);
    return courses;
 }
 
@@ -202,8 +363,20 @@ export const addCourseContents = async (req) => {
 }
 
 
-export const get_CourseContents = async ({ courseId }) => {
-   const contents = await CourseContent.find({ courseId });
+export const get_CourseContents = async ({ courseId, page, limit }) => {
+
+   const key = `contents-${courseId}:${page}:${limit}`;
+   const cachedData = await redis.get(key);
+
+   if (cachedData) {
+      console.log('data coming from redis...');
+      return JSON.parse(cachedData);
+   }
+
+   const contents = await CourseContent.find({ courseId }).skip((page - 1) * limit).limit(limit);
+
+   await redis.set(key, JSON.stringify(contents), 'EX', REDIS_DATA_EXPIRY_TIME);
+
    return contents;
 }
 

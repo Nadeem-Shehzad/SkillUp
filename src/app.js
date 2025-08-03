@@ -33,6 +33,12 @@ app.use('/api/v1/instructors', instructorRoutes);
 app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/courses', courseRoutes);
 
+// 404
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+
 app.use(customErrorHandler);
 
 export default app;

@@ -16,15 +16,22 @@ import {
    updateCourseContent,
    deleteCourseContent,
    getCourseContents,
-   getCourseContent
+   getCourseContent,
+   searchCourses,
+   searchContents,
+   searchTags,
+   searchCategory,
+   searchByInstructor
 } from "../controllers/course.controllers.js";
+
 import { createCourseValidator, updateCourseValidator } from "../validators/course.validator.js";
 import { contentValidator, updateContentValidator } from "../validators/content.validator.js";
 
 const router = express.Router();
 
+
 router.route('/')
-   .get(getAllCourses)
+   .get(getAllCourses) 
    .post(
       createCourseValidator,
       ValidateToken,
@@ -32,11 +39,10 @@ router.route('/')
       addCourse
    );
 
-
-router.route('/all-instructors').get(getAllInstructors);
+router.route('/all-instructors').get(getAllInstructors); 
 
 router.route('/instructor/:id')
-   .get(getSingleInstructorCourses);
+   .get(getSingleInstructorCourses); 
 
 router.route('/publish/:courseId')
    .post(ValidateToken, checkRole('instructor'), publishCourse);
@@ -61,8 +67,14 @@ router.route('/add-content').post(
    addCourseContent
 );
 
-router.route('/all-contents/:courseId').get(getCourseContents);
+router.route('/all-contents/:courseId').get(getCourseContents); 
 router.route('/content/:id').get(getCourseContent);
+
+router.route('/search-by-instructor').get(searchByInstructor);
+router.route('/search-courses').get(searchCourses);
+router.route('/search-contents').get(searchContents);
+router.route('/search-tags').get(searchTags);
+router.route('/search-category').get(searchCategory);
 
 router.route('/update-content/:id').put(
    updateContentValidator,

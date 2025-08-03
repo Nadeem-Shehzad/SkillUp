@@ -14,7 +14,12 @@ import {
    deleteCourseContents,
    get_CourseContents,
    get_CourseContent,
-   update_CourseContent
+   update_CourseContent,
+   searchCourseService,
+   searchContentsService,
+   searchByInstructorService,
+   searchTagsService,
+   searchCategoryService
 } from "../services/course.services.js";
 
 import ApiError, { errorMsg } from "../../../utils/apiError.js";
@@ -23,7 +28,11 @@ import { constants } from "../../../constants/statusCodes.js";
 
 export const getAllCourses = async (req, res, next) => {
    try {
-      const courses = await allCourses();
+
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const courses = await allCourses({ page, limit });
       return res.status(200).json({ success: true, message: 'All Courses', data: courses });
    } catch (error) {
       next(error);
@@ -49,8 +58,11 @@ export const addCourse = async (req, res, next) => {
 
 export const getAllInstructors = async (req, res, next) => {
    try {
-      const instructors = await allInstructors();
-      return res.status(200).json({ success: true, message: `All Insatructor's`, data: instructors });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const instructors = await allInstructors({ page, limit });
+      return res.status(200).json({ success: true, message: `All Insatructor's - page: ${page} and limit:${limit}`, data: instructors });
    } catch (error) {
       next(error);
    }
@@ -60,8 +72,84 @@ export const getAllInstructors = async (req, res, next) => {
 export const getSingleInstructorCourses = async (req, res, next) => {
    try {
       const instructorId = req.params.id;
-      const courses = await singleInstructorCourses({ instructorId });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const courses = await singleInstructorCourses({ instructorId, page, limit });
       return res.status(200).json({ success: true, message: `Insatructor's All Courses`, data: courses });
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const searchCourses = async (req, res, next) => {
+   try {
+      const searchQuery = req.query.search;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const courses = await searchCourseService({ searchQuery, page, limit });
+      return res.status(200).json({ success: true, message: `Searched Courses.`, data: courses });
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const searchContents = async (req, res, next) => {
+   try {
+      const searchQuery = req.query.search;
+      const courseId = req.query.courseId;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const contents = await searchContentsService({ searchQuery, courseId, page, limit });
+      return res.status(200).json({ success: true, message: `Searched Contents.`, data: contents });
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const searchByInstructor = async (req, res, next) => {
+   try {
+      const searchQuery = req.query.instructor;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const courses = await searchByInstructorService({ searchQuery, page, limit });
+      return res.status(200).json({ success: true, message: `Searched Instructor Courses.`, data: courses });
+
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const searchTags = async (req, res, next) => {
+   try {
+      const searchQuery = req.query.search;
+
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const courses = await searchTagsService({ searchQuery, page, limit });
+      return res.status(200).json({ success: true, message: `Searched Tags Course.`, data: courses });
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const searchCategory = async (req, res, next) => {
+   try {
+      const searchQuery = req.query.search;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const courses = await searchCategoryService({ searchQuery, page, limit });
+      return res.status(200).json({ success: true, message: `Searched Category Course.`, data: courses });
    } catch (error) {
       next(error);
    }
@@ -165,7 +253,10 @@ export const addCourseContent = async (req, res, next) => {
 export const getCourseContents = async (req, res, next) => {
    try {
       const courseId = req.params.courseId;
-      const contents = await get_CourseContents({ courseId });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const contents = await get_CourseContents({ courseId, page, limit });
       res.status(201).json({ success: true, message: 'Course Contents', data: contents });
    } catch (error) {
       next(error);
