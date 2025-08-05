@@ -4,6 +4,7 @@ export const uploader = {
     public_id: 'test-public-id',
     secure_url: 'https://test-url.com/image.jpg',
   }),
+  destroy: jest.fn().mockResolvedValue({ result: 'ok' }),
 };
 
 export default { uploader };

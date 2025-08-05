@@ -31,9 +31,7 @@ export const updateContentValidator = [
       .optional()
       .trim()
       .isLength({ min: 3 }).withMessage('min 3 chars required.')
-      .isLength({ max: 18 }).withMessage('max 18 chars allowed.')
-      .matches(/^[a-zA-Z\s]+$/)
-      .withMessage('title must contain only letters.'),
+      .isLength({ max: 18 }).withMessage('max 18 chars allowed.'),
 
    body('duration')
       .optional()

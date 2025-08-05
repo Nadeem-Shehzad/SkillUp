@@ -4,10 +4,11 @@ import ApiError from "./apiError.js";
 
 
 export const verifyUser = async ({ userId, userRole }) => {
+
    const user = await User.findById(userId);
 
    if (!user) {
-      throw new ApiError(constants.NOT_FOUND, `${userRole} not found!`);
+      throw new ApiError(constants.NOT_FOUND, `User not found!`);
    }
 
    if (user.role !== userRole) {

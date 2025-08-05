@@ -33,7 +33,18 @@ export const getAllCourses = async (req, res, next) => {
       const limit = parseInt(req.query.limit) || 10;
 
       const courses = await allCourses({ page, limit });
-      return res.status(200).json({ success: true, message: 'All Courses', data: courses });
+      const total = courses.length;
+
+      return res.status(200).json({
+         success: true,
+         message: 'All Courses',
+         data: courses,
+         meta: {
+            total,
+            page,
+            limit,
+         }
+      });
    } catch (error) {
       next(error);
    }
@@ -44,6 +55,7 @@ export const addCourse = async (req, res, next) => {
    try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+         console.log('❌ Validation Errors:', errors.array());
          const errMsg = errorMsg(errors);
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
@@ -62,7 +74,18 @@ export const getAllInstructors = async (req, res, next) => {
       const limit = parseInt(req.query.limit) || 10;
 
       const instructors = await allInstructors({ page, limit });
-      return res.status(200).json({ success: true, message: `All Insatructor's - page: ${page} and limit:${limit}`, data: instructors });
+      const total = instructors.length;
+
+      return res.status(200).json({
+         success: true,
+         message: `All Insatructor's - page: ${page} and limit:${limit}`,
+         data: instructors,
+         meta: {
+            total,
+            page,
+            limit,
+         }
+      });
    } catch (error) {
       next(error);
    }
@@ -76,7 +99,19 @@ export const getSingleInstructorCourses = async (req, res, next) => {
       const limit = parseInt(req.query.limit) || 10;
 
       const courses = await singleInstructorCourses({ instructorId, page, limit });
-      return res.status(200).json({ success: true, message: `Insatructor's All Courses`, data: courses });
+      const total = courses.length;
+
+      return res.status(200).json({
+         success: true,
+         message: `Insatructor's All Courses`,
+         data: courses,
+         meta: {
+            total,
+            page,
+            limit,
+         }
+      });
+
    } catch (error) {
       next(error);
    }
@@ -85,12 +120,24 @@ export const getSingleInstructorCourses = async (req, res, next) => {
 
 export const searchCourses = async (req, res, next) => {
    try {
-      const searchQuery = req.query.search;
+      const searchQuery = req.query.search || '';
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
 
       const courses = await searchCourseService({ searchQuery, page, limit });
-      return res.status(200).json({ success: true, message: `Searched Courses.`, data: courses });
+      const total = courses.length;
+
+      return res.status(200).json({
+         success: true,
+         message: `Searched Courses.`,
+         data: courses,
+         meta: {
+            total,
+            page,
+            limit,
+         }
+      });
+
    } catch (error) {
       next(error);
    }
@@ -144,12 +191,24 @@ export const searchTags = async (req, res, next) => {
 
 export const searchCategory = async (req, res, next) => {
    try {
-      const searchQuery = req.query.search;
+      const searchQuery = req.query.search || '';
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
 
       const courses = await searchCategoryService({ searchQuery, page, limit });
-      return res.status(200).json({ success: true, message: `Searched Category Course.`, data: courses });
+      const total = courses.length;
+
+      return res.status(200).json({ 
+         success: true, 
+         message: `Searched Category Course.`, 
+         data: courses,
+         meta: {
+            total,
+            page,
+            limit,
+         }
+       });
+
    } catch (error) {
       next(error);
    }
@@ -161,6 +220,8 @@ export const publishCourse = async (req, res, next) => {
       const userId = req.user.id;
       const userRole = req.user.role;
       const instructor = await verifyUser({ userId, userRole });
+
+      console.log(`Last id check --> ${instructor._id}`);
 
       const courseId = req.params.courseId;
       const instructorId = instructor._id;
@@ -222,6 +283,7 @@ export const deleteCourse = async (req, res, next) => {
       const userRole = req.user.role;
       const instructor = await verifyUser({ userId, userRole });
 
+
       const courseId = req.params.id;
       const instructorId = instructor._id;
       const course = await delete_Course({ instructorId, courseId });
@@ -257,7 +319,19 @@ export const getCourseContents = async (req, res, next) => {
       const limit = parseInt(req.query.limit) || 10;
 
       const contents = await get_CourseContents({ courseId, page, limit });
-      res.status(201).json({ success: true, message: 'Course Contents', data: contents });
+      const total = contents.length;
+
+      res.status(200).json({
+         success: true,
+         message: 'Course Contents',
+         data: contents,
+         meta: {
+            total,
+            page,
+            limit,
+         }
+      });
+
    } catch (error) {
       next(error);
    }
@@ -268,7 +342,7 @@ export const getCourseContent = async (req, res, next) => {
    try {
       const contentId = req.params.id;
       const content = await get_CourseContent({ contentId });
-      res.status(201).json({ success: true, message: 'Course Content', data: content });
+      res.status(200).json({ success: true, message: 'Course Content', data: content });
    } catch (error) {
       next(error);
    }
@@ -283,12 +357,17 @@ export const updateCourseContent = async (req, res, next) => {
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
 
+      console.log('***** inside update content controller *****');
+
       const contentId = req.params.id;
       const instructorId = req.user.id;
       const dataToUpdate = req.body;
       const videoData = (req.files && req.files.video) ? req.files.video : null;
+
       const content = await update_CourseContent({ instructorId, contentId, dataToUpdate, videoData });
-      res.status(201).json({ success: true, message: 'Course content added.', data: content });
+      
+      res.status(201).json({ success: true, message: 'Course content updated.', data: content });
+   
    } catch (error) {
       next(error);
    }

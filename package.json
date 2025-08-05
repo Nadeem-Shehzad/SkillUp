@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node scripts/test.mjs",
+    "test:courses": "npm test -- tests/modules/course/course.test.js",
     "dev": "nodemon src/server.js"
   },
   "keywords": [],

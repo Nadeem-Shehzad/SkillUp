@@ -3,12 +3,15 @@ import chalk from 'chalk';
 
 console.log('🔍 Running Tests...\n');
 
+const args = process.argv.slice(2);
+
 const { results } = await runCLI(
   {
     config: './jest.config.mjs',
     runInBand: true,
-    silent: true,
+    silent: false,
     detectOpenHandles: true,
+    _: args,
   },
   [process.cwd()]
 );

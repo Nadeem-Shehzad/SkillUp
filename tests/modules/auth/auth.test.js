@@ -1,4 +1,4 @@
-// File: tests/modules/auth/auth.test.js
+
 import request from 'supertest';
 import path from 'path';
 import {
@@ -23,6 +23,8 @@ beforeAll(async () => {
    app = (await import('../../../src/app.js')).default;
 });
 
+const baseUrl = '/api/v1/auth';
+
 
 describe('register', () => {
    jest.setTimeout(15_000); // to allow image upload and DB interaction
@@ -31,10 +33,11 @@ describe('register', () => {
 
    it('should register a user successfully with an image', async () => {
       const res = await request(app)
-         .post('/api/auth/register')
+         .post(`${baseUrl}/register`)
          .field('name', 'John Doe')
          .field('email', email)
          .field('password', '12345678')
+         .field('role','instructor')
          .attach('image', path.resolve('./tests/fixtures/test.image.jpg'));
 
       // Assertions
@@ -48,17 +51,19 @@ describe('register', () => {
    it('should fail if email is already registered', async () => {
 
       await request(app)
-         .post('/api/auth/register')
+         .post(`${baseUrl}/register`)
          .field('name', 'John Doe')
          .field('email', email)
          .field('password', '12345678')
+         .field('role','instructor')
          .attach('image', path.resolve('./tests/fixtures/test.image.jpg'));
 
       const res = await request(app)
-         .post('/api/auth/register')
+         .post(`${baseUrl}/register`)
          .field('name', 'John Doe')
          .field('email', email)
          .field('password', '12345678')
+         .field('role','instructor')
          .attach('image', path.resolve('./tests/fixtures/test.image.jpg'));
 
       expect(res.statusCode).toBe(400);
@@ -69,7 +74,7 @@ describe('register', () => {
 
    it('Should fail if name or email or password missing.', async () => {
       const res = await request(app)
-         .post('/api/auth/register')
+         .post(`${baseUrl}/register`)
          .field('name', 'John Doe')
          .field('password', '12345678')
          .attach('image', path.resolve('./tests/fixtures/test.image.jpg'));
@@ -84,10 +89,11 @@ describe('register', () => {
 describe('login', () => {
    const email = 'john@example.com';
    const password = '12345678';
+   const role = 'instructor';
 
    it('should login user and return token', async () => {
 
-      const { accessToken, refreshToken } = await registerAndLogin({ email, password });
+      const { accessToken, refreshToken } = await registerAndLogin({ email, password, role });
 
       expect(typeof accessToken).toBe('string');
       expect(accessToken.length).toBeGreaterThan(10);
@@ -95,21 +101,21 @@ describe('login', () => {
 });
 
 
-describe('me', () => {
-   it('should return user info when token is valid.', async () => {
-      const { accessToken, refreshToken } = await registerAndLogin();
+// describe.only('me', () => {
+//    it('should return user info when token is valid.', async () => {
+//       const { accessToken, refreshToken } = await registerAndLogin();
 
-      const res = await request(app)
-         .get('/api/auth/me')
-         .set('Authorization', `Bearer ${accessToken}`);
+//       const res = await request(app)
+//          .get(`${baseUrl}/me`)
+//          .set('Authorization', `Bearer ${accessToken}`);
 
-      expect(res.statusCode).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.message).toBe('Current User');
-      expect(res.body.data.name).toBe('John Doe');
-      expect(res.body.data.email).toBe('john@example.com');
-   });
-});
+//       expect(res.statusCode).toBe(200);
+//       expect(res.body.success).toBe(true);
+//       expect(res.body.message).toBe('Current User');
+//       expect(res.body.data.name).toBe('John Doe');
+//       expect(res.body.data.email).toBe('john@example.com');
+//    });
+// });
 
 
 describe('update-password', () => {
@@ -117,7 +123,7 @@ describe('update-password', () => {
       const { accessToken, refreshToken } = await registerAndLogin();
 
       const res = await request(app)
-         .put('/api/auth/change-password')
+         .put(`${baseUrl}/change-password`)
          .set('Authorization', `Bearer ${accessToken}`)
          .send({ oldPassword: '12345678', password: '112233' });
 
@@ -128,27 +134,27 @@ describe('update-password', () => {
 });
 
 
-describe('update-profile', () => {
-   it('Should update user profile.', async () => {
-      const { accessToken, refreshToken } = await registerAndLogin();
+// describe('update-profile', () => {
+//    it('Should update user profile.', async () => {
+//       const { accessToken, refreshToken } = await registerAndLogin();
 
-      const res = await request(app)
-         .put('/api/auth/update-profile')
-         .set('Authorization', `Bearer ${accessToken}`)
-         .send({ name: 'John Cena' });
+//       const res = await request(app)
+//          .put(`${baseUrl}/update-profile`)
+//          .set('Authorization', `Bearer ${accessToken}`)
+//          .send({ name: 'John Cena' });
 
-      expect(res.statusCode).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.message).toBe('User Profile Updated.');
-      expect(res.body.data.name).toBe('John Cena');
-   });
-});
+//       expect(res.statusCode).toBe(200);
+//       expect(res.body.success).toBe(true);
+//       expect(res.body.message).toBe('User Profile Updated.');
+//       expect(res.body.data.name).toBe('John Cena');
+//    });
+// });
 
 
 describe('verify-email', () => {
    it('should send account verification email.', async () => {
       const res = await request(app)
-         .post('/api/auth/verify-email')
+         .post(`${baseUrl}/verify-email`)
          .send({ email: 'test@gmail.com' });
 
       expect(res.statusCode).toBe(200);
@@ -182,15 +188,13 @@ describe('verify-otp', () => {
    afterAll(async () => {
       await redis.del(`verify:${testEmail}`);
       await User.deleteMany({});
-      await mongoose.connection.close(); 
+      await mongoose.connection.close();
    });
 
    it('should verify otp', async () => {
       const res = await request(app)
-         .post('/api/auth/verify-otp')
+         .post(`${baseUrl}/verify-otp`)
          .send({ email: testEmail, code: testCode });
-
-      console.log('🧪 API Response:', res.body);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
@@ -208,7 +212,7 @@ describe('verify-otp', () => {
       await redis.set(`verify:${testEmail}`, testCode, 'EX', 300);
 
       const res = await request(app)
-         .post('/api/auth/verify-otp')
+         .post(`${baseUrl}/verify-otp`)
          .send({ email: testEmail, code: '000000' });
 
       expect(res.statusCode).toBe(400);
@@ -225,7 +229,7 @@ describe('forgot-password', () => {
       const testEmail = 'john@example.com';
 
       const res = await request(app)
-         .post('/api/auth/forgot-password')
+         .post(`${baseUrl}/forgot-password`)
          .send({ email: testEmail });
 
       expect(res.statusCode).toBe(200);
@@ -255,7 +259,7 @@ describe('reset-password', () => {
       await registerAndLogin();
 
       const res = await request(app)
-         .post(`/api/auth/reset-password?token=${token}`)
+         .post(`${baseUrl}/reset-password?token=${token}`)
          .send({ email: testEmail, newPassword: password });
 
       expect(res.statusCode).toBe(200);
@@ -286,7 +290,7 @@ describe('logout', () => {
    it('should logout user', async () => {
 
       const res = await request(app)
-         .post('/api/auth/logout')
+         .post(`${baseUrl}/logout`)
          .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toBe(200);

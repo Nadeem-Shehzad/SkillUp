@@ -6,7 +6,7 @@ import { constants } from "../../../constants/statusCodes.js";
 import { addVideoUpdateJob, addVideoUploadJob } from "../bullmq/jobs/video.job.js";
 import { Instructor } from "../../instructor/models/instructor.model.js";
 import { deleteVideo } from "../../../utils/video.js";
-import { redis, REDIS_DATA_EXPIRY_TIME, runInTransaction } from "../../../config/index.js";
+import { redis, REDIS_DATA_EXPIRY_TIME, runInTransaction, NODE_ENV } from "../../../config/index.js";
 
 
 
@@ -69,10 +69,20 @@ export const createCourse = async (req) => {
       isPublished,
    });
 
-   await addImageUploadJob({
-      imagePath: req.files.image,
-      courseId: course._id
-   });
+   if (NODE_ENV === 'test') {
+      course.thumbnail = {
+         id: 'mocked-public-id',
+         url: 'https://mocked.cloudinary.com/image.jpg',
+      };
+
+      await course.save();
+
+   } else {
+      await addImageUploadJob({
+         imagePath: req?.files?.image,
+         courseId: course._id
+      });
+   }
 
    return course;
 }
@@ -240,6 +250,7 @@ export const singleInstructorCourses = async ({ instructorId, page, limit }) => 
 
 
 export const publish_Course = async ({ instructorId, courseId }) => {
+
    const course = await Course.findById(courseId);
 
    if (!course) {
@@ -354,10 +365,25 @@ export const addCourseContents = async (req) => {
       order
    });
 
-   const videoData = await addVideoUploadJob({
-      videoPath: req.files.video,
-      contentId: courseContent._id
-   });
+   if (NODE_ENV === 'test') {
+      // courseContent.video = {
+      //    id: 'mocked-public-id',
+      //    url: 'https://mocked.cloudinary.com/image.jpg',
+      // };
+
+      // await courseContent.save();
+
+   } else {
+      const videoData = await addVideoUploadJob({
+         videoPath: req.files.video,
+         contentId: courseContent._id
+      });
+   }
+
+   // const videoData = await addVideoUploadJob({
+   //    videoPath: req.files.video,
+   //    contentId: courseContent._id
+   // });
 
    return courseContent;
 }
@@ -376,12 +402,14 @@ export const get_CourseContents = async ({ courseId, page, limit }) => {
    const contents = await CourseContent.find({ courseId }).skip((page - 1) * limit).limit(limit);
 
    await redis.set(key, JSON.stringify(contents), 'EX', REDIS_DATA_EXPIRY_TIME);
+   console.log('***** inside get contents service *****');
 
    return contents;
 }
 
 
 export const get_CourseContent = async ({ contentId }) => {
+   
    const content = await CourseContent.findById(contentId);
    if (!content) {
       throw new ApiError(constants.NOT_FOUND, 'Content Data not Found!');

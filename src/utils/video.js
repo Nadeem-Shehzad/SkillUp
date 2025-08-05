@@ -4,9 +4,11 @@ import { constants } from "../constants/statusCodes.js";
 
 
 export const videoUpload = async (videoPath) => {
-   if (videoPath) {
+   const pathToUpload = videoPath?.tempFilePath || videoPath;
 
-      const result = await cloudinary.uploader.upload(videoPath.tempFilePath, {
+   if (pathToUpload) {
+
+      const result = await cloudinary.uploader.upload(pathToUpload, {
          public_id: `${Date.now()}`,
          resource_type: "video",
          folder: "videos"
@@ -27,6 +29,10 @@ export const videoUpload = async (videoPath) => {
       };
    } else {
       console.log(`Video: Video Path missing!.`);
+      return {
+         id: '',
+         url: ''
+      };
    }
 }
 
@@ -37,7 +43,7 @@ export const deleteVideo = async (videoPublicId) => {
          videoPublicId,
          { resource_type: "video", invalidate: true }
       );
-   
+
       if (response.result !== 'ok' && response.result !== 'not found') {
          throw new Error(`Video deletion failed: ${response.result}`);
       }

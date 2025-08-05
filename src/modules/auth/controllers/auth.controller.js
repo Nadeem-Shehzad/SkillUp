@@ -27,9 +27,9 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
    try {
       const user = await validateUser(req.body);
-      const { accessToken, refreshToken } = await generateToken(user);
+      const { accessToken, refreshToken, userId } = await generateToken(user);
 
-      res.status(200).json({ success: true, message: 'User LogedIn.', data: { accessToken, refreshToken } });
+      res.status(200).json({ success: true, message: 'User LogedIn.', data: { accessToken, refreshToken, userId } });
 
    } catch (error) {
       next(error);

@@ -29,7 +29,8 @@ export const generateToken = async (user) => {
 
    return {
       accessToken,
-      refreshToken
+      refreshToken,
+      userId: user._id,
    }
 }
 

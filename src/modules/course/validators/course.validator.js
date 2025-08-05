@@ -6,9 +6,7 @@ export const createCourseValidator = [
       .exists({ checkFalsy: true }).withMessage('title is required.')
       .trim()
       .isLength({ min: 3 }).withMessage('min 3 chars required.')
-      .isLength({ max: 18 }).withMessage('max 18 chars allowed.')
-      .matches(/^[a-zA-Z\s]+$/)
-      .withMessage('title must contain only letters.'),
+      .isLength({ max: 18 }).withMessage('max 18 chars allowed.'),
 
    body('description')
       .exists({ checkFalsy: true }).withMessage('description is required.')
@@ -35,13 +33,17 @@ export const createCourseValidator = [
       .optional()
       .isInt({ min: 0 }).withMessage('discount must be a non-negative integer'),
 
+   body('instructor')
+      .exists({ checkFalsy: true }).withMessage('Instructor is required.')
+      .isMongoId().withMessage('Instructor must be a valid MongoID'),
+
    body('tags')
       .optional()
       .isArray().withMessage('Tags must be an array of strings'),
 
    body('language')
       .optional()
-      .isString().withMessage('language must be a string'),   
+      .isString().withMessage('language must be a string'),
 ];
 
 
@@ -51,9 +53,7 @@ export const updateCourseValidator = [
       .optional()
       .trim()
       .isLength({ min: 3 }).withMessage('min 3 chars required.')
-      .isLength({ max: 18 }).withMessage('max 18 chars allowed.')
-      .matches(/^[a-zA-Z\s]+$/)
-      .withMessage('title must contain only letters.'),
+      .isLength({ max: 18 }).withMessage('max 18 chars allowed.'),
 
    body('description')
       .optional()
@@ -86,5 +86,5 @@ export const updateCourseValidator = [
 
    body('language')
       .optional()
-      .isString().withMessage('language must be a string'),   
+      .isString().withMessage('language must be a string'),
 ];

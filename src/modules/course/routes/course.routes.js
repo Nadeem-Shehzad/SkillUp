@@ -56,7 +56,7 @@ router.route('/:id')
       ValidateToken,
       checkRole('instructor'),
       updateCourse
-   ).delete(ValidateToken, checkRole('instructor'), deleteCourse);
+   ).delete(ValidateToken, checkRole('instructor'), deleteCourse); 
 
 
 // content apis   
@@ -70,7 +70,7 @@ router.route('/add-content').post(
 router.route('/all-contents/:courseId').get(getCourseContents); 
 router.route('/content/:id').get(getCourseContent);
 
-router.route('/search-by-instructor').get(searchByInstructor);
+router.route('/search-by-instructor').get(searchByInstructor); 
 router.route('/search-courses').get(searchCourses);
 router.route('/search-contents').get(searchContents);
 router.route('/search-tags').get(searchTags);
@@ -87,7 +87,7 @@ router.route('/delete-content/:id').delete(
    ValidateToken,
    checkRole('instructor'),
    deleteCourseContent
-);
+); 
 
 
 export default router;

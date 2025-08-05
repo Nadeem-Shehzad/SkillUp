@@ -42,8 +42,23 @@ jest.unstable_mockModule('cloudinary', () => ({
   v2: {
     config: jest.fn(),
     uploader: {
-      upload: jest.fn().mockResolvedValue({
-        secure_url: 'https://mocked.cloudinary.com/image.jpg',
+      upload: jest.fn((filePath, options = {}) => {
+        if (options.resource_type === 'video') {
+          return Promise.resolve({
+            public_id: 'mocked-video-id',
+            secure_url: 'https://mocked.cloudinary.com/video.mp4',
+          });
+        }
+
+        // default is image
+        return Promise.resolve({
+          public_id: 'mocked-image-id',
+          secure_url: 'https://mocked.cloudinary.com/image.jpg',
+        });
+      }),
+
+      destroy: jest.fn((publicId, options = {}) => {
+        return Promise.resolve({ result: 'ok' });
       }),
     },
   },
