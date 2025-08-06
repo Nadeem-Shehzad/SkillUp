@@ -6,7 +6,7 @@ export const checkRole = (...allowedRoles) => {
       if(!req.user){
          throw new ApiError(constants.FORBIDDEN,'User not Found!');
       }
-
+      
       if(!allowedRoles.includes(req.user.role)){
          throw new ApiError(constants.FORBIDDEN,`Acces Denied. only allow --> ${allowedRoles}`);
       }

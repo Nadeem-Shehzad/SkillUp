@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node scripts/test.mjs",
     "test:courses": "npm test -- tests/modules/course/course.test.js",
+    "test:students": "npm test -- tests/modules/student/student.test.js",
     "dev": "nodemon src/server.js"
   },
   "keywords": [],

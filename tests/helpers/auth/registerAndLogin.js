@@ -1,6 +1,8 @@
 import request from 'supertest';
 import path from 'path';
 import app from '../../../src/app.js';
+import User from '../../../src/modules/auth/models/auth.model.js';
+
 
 
 export const registerAndLogin = async ({
@@ -11,13 +13,15 @@ export const registerAndLogin = async ({
    imagePath = './tests/fixtures/test.image.jpg' }
    = {}) => {
 
+   await User.deleteOne({ email });
+
    // register user    
    await request(app)
       .post('/api/v1/auth/register')
       .field('name', name)
       .field('email', email)
       .field('password', password)
-      .field('role',role)
+      .field('role', role)
       .attach('image', path.resolve(imagePath));
 
    // login user to get token
@@ -29,5 +33,5 @@ export const registerAndLogin = async ({
    const refreshToken = loginRes.body.data.refreshToken;
    const userId = loginRes.body.data.userId;
 
-   return { accessToken, refreshToken, userId }; // return token   
+   return { accessToken, refreshToken, userId };
 }
