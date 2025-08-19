@@ -13,6 +13,7 @@ import { customErrorHandler } from './middlewares/errorHandler.js';
 
 // load workers
 import './bullmq/workerLoader.js';
+import { enrollmentRoutes } from './modules/enrollment/index.js';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/instructors', instructorRoutes);
 app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/courses', courseRoutes);
+app.use('/api/v1/enrollments', enrollmentRoutes);
 
 // 404
 app.use((req, res) => {

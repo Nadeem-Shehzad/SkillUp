@@ -108,7 +108,7 @@ export const addBookmarkCourseService = async ({ studentId, courseId }) => {
       { new: true }
    );
 
-   return student.bookmarks;
+   return course._id;
 }
 
 

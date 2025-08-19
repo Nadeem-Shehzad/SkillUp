@@ -71,7 +71,7 @@ describe('POST /api/v1/students/bookmarks/:courseId', () => {
 });
 
 
-describe.only('GET /api/v1/students/bookmarks', () => {
+describe('GET /api/v1/students/bookmarks', () => {
    it('should get student bookmarks', async () => {
 
       await request(app)
@@ -86,5 +86,23 @@ describe.only('GET /api/v1/students/bookmarks', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe('All Bookmark.');
       expect(res.body.data.bookmarks.length).toBe(1);
+   });
+});
+
+
+describe.only('DELETE /api/v1/students/bookmarks/:id', () => {
+   it('should delete student bookmark', async () => {
+
+      const bookmark = await request(app)
+         .post(`${baseUrl}/bookmarks/${courseId}`)
+         .set('Authorization', `Bearer ${token}`);
+
+      const res = await request(app)
+         .delete(`${baseUrl}/bookmarks/${bookmark.body.data}`)
+         .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toBe('Bookmark Deleted.');
    });
 });

@@ -26,13 +26,6 @@ router.route('/bookmarks')
     .get(ValidateToken, getBookmarks);
 
 router.route('/bookmarks/:id')
-    .delete(ValidateToken, deleteBookmark);    
-
-//DELETE	/api/student/bookmarks/:courseId	Remove course from bookmarks
-
-//POST	/api/student/enroll/:courseId	Enroll in a course
-//GET	/api/student/enrolled-courses	Get all enrolled courses
-//GET	/api/student/enrolled-courses/:id	Get specific enrolled course details
-//DELETE	/api/student/enroll/:courseId	Unenroll from a course (optional)
+    .delete(ValidateToken, deleteBookmark);
 
 export default router;

@@ -60,7 +60,7 @@ export const addCourse = async (req, res, next) => {
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
 
-      const course = await createCourse(req);
+      const course = await createCourse(req.body);
       res.status(201).json({ success: true, message: 'Course created Successfully.', data: course });
    } catch (error) {
       next(error);
@@ -356,8 +356,6 @@ export const updateCourseContent = async (req, res, next) => {
          const errMsg = errorMsg(errors);
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
-
-      console.log('***** inside update content controller *****');
 
       const contentId = req.params.id;
       const instructorId = req.user.id;

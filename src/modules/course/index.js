@@ -1,2 +1,2 @@
 
-export {default as courseRoutes} from './routes/course.routes.js';
+export { default as courseRoutes } from './routes/course.routes.js';

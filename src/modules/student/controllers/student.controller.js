@@ -41,9 +41,9 @@ export const addCourseToBookmark = async (req, res, next) => {
       const courseId = req.params.courseId;
       const studentId = student._id;
 
-      const bookmarked = await addBookmarkCourseService({ studentId, courseId });
+      const bookmarkedCourseId = await addBookmarkCourseService({ studentId, courseId });
 
-      res.status(200).json({ success: true, message: 'Course added to Bookmark.', data: bookmarked });
+      res.status(200).json({ success: true, message: 'Course added to Bookmark.', data: bookmarkedCourseId });
 
    } catch (error) {
       next(error);
