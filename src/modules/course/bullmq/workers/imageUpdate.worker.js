@@ -58,3 +58,7 @@ imageUpdateWorker.on('error', (err) => {
 imageUpdateWorker.on('closed', () => {
    console.warn('⚠️ ImageUpdate Worker closed unexpectedly');
 });
+
+imageUpdateWorker.on('drained', () => {
+  //console.log("✨ ImageUpdate worker ---->  All jobs in the queue have been processed. Queue is empty.");
+});

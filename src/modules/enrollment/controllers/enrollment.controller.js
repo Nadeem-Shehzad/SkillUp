@@ -10,7 +10,7 @@ import {
    getEnrolledCoursesService,
    getEnrolledStudentsService,
    topEnrollmentCoursesService,
-} from "../services/enrollment.services.js";
+} from "../services/enrollment.service.js";
 
 
 // public

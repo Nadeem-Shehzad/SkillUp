@@ -6,7 +6,7 @@ import {
    getBookmarksService,
    getStudentProfile,
    updateUserProfile
-} from "../services/student.services.js";
+} from "../services/student.service.js";
 
 
 export const getProfile = async (req, res, next) => {

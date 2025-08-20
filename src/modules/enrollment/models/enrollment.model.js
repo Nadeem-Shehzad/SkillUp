@@ -12,5 +12,4 @@ const enrollmentSchema = new Schema({
   lastAccessed: { type: Date }
 }, { timestamps: true });
 
-const Enrollment = mongoose.model('Enrollment', enrollmentSchema);
-export default Enrollment;
+export const Enrollment = mongoose.model('Enrollment', enrollmentSchema);

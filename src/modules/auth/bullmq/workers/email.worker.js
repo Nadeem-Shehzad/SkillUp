@@ -33,4 +33,8 @@ if (process.env.NODE_ENV !== 'test') {
   emailWorker.on('failed', (job, err) => {
     console.error(`❌ Worker: Failed to send email to ${job?.data?.to}`, err);
   });
+
+  emailWorker.on('drained', () => {
+  console.log("✨ All jobs in the queue have been processed. Queue is empty.");
+});
 }

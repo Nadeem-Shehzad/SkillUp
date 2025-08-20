@@ -58,3 +58,7 @@ videoUpdateWorker.on('error', (err) => {
 videoUpdateWorker.on('closed', () => {
    console.warn('⚠️ VideoUpdate Worker closed unexpectedly');
 });
+
+videoUpdateWorker.on('drained', () => {
+  //console.log("✨ VideoUpdate worker ---->  All jobs in the queue have been processed. Queue is empty.");
+});

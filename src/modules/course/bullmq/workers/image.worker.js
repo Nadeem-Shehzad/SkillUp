@@ -10,7 +10,6 @@ const processImageUploadJob = async (job) => {
    console.log('📨 worker --> Processing ImageUpload job');
 
    const { imagePath, courseId } = job.data;
-   //await new Promise(res => setTimeout(res, 5000));
    try {
       const thumbnail = await imageUpload(imagePath);
       if (thumbnail.id === '' || thumbnail.url === '') {
@@ -57,4 +56,8 @@ imageWorker.on('error', (err) => {
 
 imageWorker.on('closed', () => {
    console.warn('⚠️ Image Worker closed unexpectedly');
+});
+
+imageWorker.on('drained', () => {
+  //console.log("✨ Image worker ----> All jobs in the queue have been processed. Queue is empty.");
 });

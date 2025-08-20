@@ -4,16 +4,16 @@ import { checkRole } from "../../../middlewares/checkRole.js";
 import { ValidateToken } from "../../../middlewares/validateToken.js";
 
 import {
-   admin_allStats,
-   admin_courseEnrollments,
-   admin_deleteEnrollment,
-   admin_studentEnrollments,
-   admin_updateEnrollment,
    courseEnrollment,
    enrolledCourseDetails,
    enrolledCourses,
    enrolledStudents,
    topEnrollmentCourses,
+   admin_allStats,
+   admin_courseEnrollments,
+   admin_deleteEnrollment,
+   admin_studentEnrollments,
+   admin_updateEnrollment,
 } from "../controllers/enrollment.controller.js";
 
 

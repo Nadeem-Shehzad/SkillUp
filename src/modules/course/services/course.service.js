@@ -45,7 +45,7 @@ export const createCourse = async (req) => {
       instructor,
       isPublished
    } = req.body;
-
+   
    // if (req.files && req.files.image) {
    //    thumbnailData = await imageUpload(req);
    // }
@@ -78,6 +78,7 @@ export const createCourse = async (req) => {
       await course.save();
 
    } else {
+      console.log('inside addImageUploadJob');
       await addImageUploadJob({
          imagePath: req?.files?.image,
          courseId: course._id

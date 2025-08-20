@@ -3,7 +3,7 @@ import {
    findLoginInstructor,
    getProfile,
    updateProfile
-} from "../services/instructor.services.js";
+} from "../services/instructor.service.js";
 
 
 export const getInstructorProfile = async (req, res, next) => {

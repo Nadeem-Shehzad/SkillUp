@@ -20,7 +20,7 @@ import {
    searchByInstructorService,
    searchTagsService,
    searchCategoryService
-} from "../services/course.services.js";
+} from "../services/course.service.js";
 
 import ApiError, { errorMsg } from "../../../utils/apiError.js";
 import { constants } from "../../../constants/statusCodes.js";
@@ -55,17 +55,41 @@ export const addCourse = async (req, res, next) => {
    try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-         console.log('❌ Validation Errors:', errors.array());
+         //console.log('❌ Validation Errors:', errors.array());
          const errMsg = errorMsg(errors);
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
 
-      const course = await createCourse(req.body);
+      const course = await createCourse(req);
       res.status(201).json({ success: true, message: 'Course created Successfully.', data: course });
    } catch (error) {
       next(error);
    }
 }
+
+// temp
+// export const addCourses = async (req, res, next) => {
+//    try {
+
+//       for (let i = 71; i < 95; i++) {
+//          await Course.create({
+//             title: `Course ${i + 1}`,
+//             description: `Modern Business : ${i + 1}`,
+//             category: 'business',
+//             level: 'intermediate',
+//             price: 2000,
+//             discount: 0,
+//             totalLectures: 10,
+//             instructor: new mongoose.Types.ObjectId('688c3afea844724d6ac4cadf'),
+//             isPublished: true,
+//          });
+//       };
+
+//       res.status(201).json({ success: true, message: 'All Courses created Successfully.', data: null });
+//    } catch (error) {
+//       next(error);
+//    }
+//}
 
 
 export const getAllInstructors = async (req, res, next) => {
@@ -198,16 +222,16 @@ export const searchCategory = async (req, res, next) => {
       const courses = await searchCategoryService({ searchQuery, page, limit });
       const total = courses.length;
 
-      return res.status(200).json({ 
-         success: true, 
-         message: `Searched Category Course.`, 
+      return res.status(200).json({
+         success: true,
+         message: `Searched Category Course.`,
          data: courses,
          meta: {
             total,
             page,
             limit,
          }
-       });
+      });
 
    } catch (error) {
       next(error);
@@ -363,9 +387,9 @@ export const updateCourseContent = async (req, res, next) => {
       const videoData = (req.files && req.files.video) ? req.files.video : null;
 
       const content = await update_CourseContent({ instructorId, contentId, dataToUpdate, videoData });
-      
+
       res.status(201).json({ success: true, message: 'Course content updated.', data: content });
-   
+
    } catch (error) {
       next(error);
    }

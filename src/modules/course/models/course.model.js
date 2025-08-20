@@ -61,17 +61,8 @@ const courseSchema = new mongoose.Schema(
          ref: 'Instructor',
          required: true,
       },
-      ratings: [
-         {
-            student: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
-            rating: { type: Number, min: 1, max: 5 },
-            review: String,
-         },
-      ],
-      averageRating: {
-         type: Number,
-         default: 0,
-      },
+      averageRating: { type: Number, default: 0 },
+      totalReviews: { type: Number, default: 0 },
       isPublished: {
          type: Boolean,
          default: false,

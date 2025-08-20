@@ -58,3 +58,7 @@ videoWorker.on('error', (err) => {
 videoWorker.on('closed', () => {
    console.warn('⚠️ Video Worker closed unexpectedly');
 });
+
+videoWorker.on('drained', () => {
+  //console.log("✨ Video worker ---->  All jobs in the queue have been processed. Queue is empty.");
+});

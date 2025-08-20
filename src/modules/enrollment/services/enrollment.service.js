@@ -3,7 +3,7 @@ import ApiError from "../../../utils/apiError.js";
 import { constants } from "../../../constants/statusCodes.js";
 import { Course } from "../../course/models/course.model.js";
 import { Student } from "../../student/index.js";
-import Enrollment from "../models/enrollment.model.js";
+import { Enrollment } from "../models/enrollment.model.js";
 import {
    newEnrollmentsThisMonth,
    overallStats,

@@ -10,7 +10,7 @@ import {
    reset_Password,
    handleRefreshToken,
    handleLogout
-} from "../services/auth.services.js";
+} from "../services/auth.service.js";
 
 
 export const register = async (req, res, next) => {
