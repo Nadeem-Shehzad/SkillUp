@@ -1,4 +1,6 @@
+
 import { Course } from "../models/course.model.js";
+import { InstructorClientService } from "./instructorClient.service.js";
 
 
 export const CoursePublicService = {
@@ -13,6 +15,15 @@ export const CoursePublicService = {
          averageRating: avgRating,
          totalReviews
       });
+   },
+
+   async getCourseSummary(courseId) {
+      const course = await Course.findById(courseId);
+      const instructor = await InstructorClientService.getInstructorData(course.instructor);
+
+      const courseName = course.title;
+
+      return { courseName, instructor };
    }
 
 };

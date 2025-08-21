@@ -24,3 +24,22 @@ export const isValidStudent = async (req, res, next) => {
    req.courseId = review.courseId;
    next();
 }
+
+
+export const checkReviewExists = async (req, res, next) => {
+   try {
+      const reviewId = req.params.reviewId;
+
+      const review = await Review.findById(reviewId);
+      if (!review) {
+         throw new ApiError(constants.NOT_FOUND, 'Review not Found!');
+      }
+
+      req.reviewId = reviewId;
+      req.courseId = review.courseId;
+      next();
+
+   } catch (error) {
+      next(error);
+   }
+}

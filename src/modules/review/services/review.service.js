@@ -1,17 +1,74 @@
 
+import mongoose from "mongoose";
 import { constants } from "../../../constants/statusCodes.js";
 import ApiError from "../../../utils/apiError.js";
 import { Review } from "../models/review.model.js";
+import { totalStats, ratingDistribution, latestReviews } from "../pipelines/review.pipelines.js";
+import { AuthClientService } from "./authClient.service.js";
 import { CourseClientService } from "./courseClient.service.js";
 
 
+
+
+//public 
 export const getCourseReviewsService = async ({ courseId }) => {
    const reviews = await Review.find({ courseId });
    return reviews;
 }
 
 
-export const addReviewService = async ({ studentId, courseId, rating, comment }) => {
+export const getCourseReviewsAnalyticsService = async ({ courseId }) => {
+
+   const reviewsAnalytics = await Review.aggregate([
+
+      { $match: { courseId: new mongoose.Types.ObjectId(courseId) } },
+
+      {
+         $facet: {
+            totalStats: totalStats,
+            ratingDistribution: ratingDistribution,
+            latestReviews: latestReviews
+         }
+      }
+
+   ]);
+
+   return reviewsAnalytics;
+}
+
+
+export const getTopRatedCoursesService = async () => {
+
+   const topRatedCourses = await Review.aggregate([
+      {
+         $group: {
+            _id: { courseId: "$courseId", courseName: "$courseName", instructorName: "$instructorName" },
+            avgRating: { $avg: "$rating" },
+            totalReviews: { $sum: 1 }
+         }
+      },
+      { $sort: { avgRating: -1, totalReviews: -1 } },
+      { $limit: 10 },
+      {
+         $project: {
+            _id: 0,
+            courseId: "$_id.courseId",
+            courseName: "$_id.courseName",
+            instructorName: "$_id.instructorName",
+            avgRating: { $round: ["$avgRating", 1] },
+            totalReviews: 1
+         }
+      }
+   ]);
+
+   return topRatedCourses;
+}
+
+
+
+
+//student
+export const addReviewService = async ({ studentId, studentAuthID, courseId, rating, comment }) => {
 
    const reviewExists = await Review.findOne({
       courseId,
@@ -22,15 +79,21 @@ export const addReviewService = async ({ studentId, courseId, rating, comment })
       throw new ApiError(constants.FORBIDDEN, "You already reviewed this course");
    }
 
+   const { courseName, instructor } = await CourseClientService.getCourseSummary(courseId);
+   const user = await AuthClientService.getUserInfo(studentAuthID);
+
    const review = await Review.create({
       studentId,
+      studentName: user.name,
       courseId,
+      courseName,
+      instructorName: instructor.name,
       rating,
       comment
    });
 
    const reviews = await Review.find({ courseId });
-   const avgRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
+   const avgRating = parseFloat(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1);
 
    await CourseClientService.updateCourseRating(courseId, avgRating, reviews.length);
 
@@ -51,7 +114,7 @@ export const updateReviewService = async ({ reviewId, courseId, dataToUpdate }) 
    }
 
    const reviews = await Review.find({ courseId });
-   const avgRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
+   const avgRating = parseFloat(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1);
 
    await CourseClientService.updateCourseRating(courseId, avgRating, reviews.length);
 
@@ -59,16 +122,33 @@ export const updateReviewService = async ({ reviewId, courseId, dataToUpdate }) 
 }
 
 
+// for student/admin
 export const deleteReviewService = async ({ reviewId, courseId }) => {
 
    const deletedReview = await Review.findByIdAndDelete(reviewId);
 
-   if (!deletedReview) {
-      throw new ApiError(constants.NOT_FOUND, "Review not found or already deleted!");
-   }
-
    const reviews = await Review.find({ courseId });
-   const avgRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
+   const avgRating = parseFloat(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1);
 
    await CourseClientService.updateCourseRating(courseId, avgRating, reviews.length);
+}
+
+
+export const getMyReviewsService = async ({ studentId }) => {
+
+   const reviews = await Review.find({ studentId });
+
+   return reviews;
+}
+
+
+
+
+
+// instructor
+export const getMyCourseReviewsService = async ({ courseId }) => {
+
+   const reviews = await Review.find({ courseId });
+
+   return reviews;
 }

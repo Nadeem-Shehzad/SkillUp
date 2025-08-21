@@ -1,4 +1,6 @@
+
 import { CoursePublicService } from "../../course/index.js";
+
 
 export const CourseClientService = {
 
@@ -8,5 +10,9 @@ export const CourseClientService = {
 
    async updateCourseRating(courseId, avgRating, totalReviews) {
       return CoursePublicService.updateCourseRating(courseId, avgRating, totalReviews);
+   },
+
+   async getCourseSummary(courseId) {
+      return CoursePublicService.getCourseSummary(courseId);
    }
 }
