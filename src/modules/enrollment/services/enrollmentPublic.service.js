@@ -3,8 +3,8 @@ import { Enrollment } from "../models/enrollment.model.js";
 
 export const EnrollmentPublicService = {
 
-   async checkEnrollment(studentId, courseId) {
-      const enrollment = await Enrollment.findOne({
+   checkEnrollment(studentId, courseId) {
+      const enrollment = Enrollment.findOne({
          studentId,
          courseId
       });

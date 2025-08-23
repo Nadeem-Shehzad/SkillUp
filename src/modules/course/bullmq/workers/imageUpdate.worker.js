@@ -1,6 +1,8 @@
 import { createWorker } from "../../../../config/index.js";
-import { deleteImage, imageUpload } from "../../../../utils/image.js";
+import { deleteImage, imageUpload } from "../../utils/image.js";
 import { Course } from "../../models/course.model.js";
+
+import { logger } from "@skillup/common-utils";
 
 
 //console.log('** imageUpdate worker loads **');
@@ -33,10 +35,10 @@ const processImageUpdateJob = async (job) => {
       if (!updated)
          throw new ApiError(constants.SERVER_ERROR, 'Course not found or not updated');
 
-      console.log(`✅ Image and Course updated: ${courseId}`);
+      logger.info(`✅ Image and Course updated: ${courseId}`);
 
    } catch (error) {
-      console.error("❌ ImageUpdate Worker error:", err);
+      logger.error("❌ ImageUpdate Worker error:", err);
       throw error;
    }
 }
@@ -44,21 +46,21 @@ const processImageUpdateJob = async (job) => {
 const imageUpdateWorker = createWorker('imageUpdateQueue', processImageUpdateJob);
 
 imageUpdateWorker.on('completed', (job) => {
-   console.log(`🎉 ImageUpdate Job completed. ${job.id}`);
+   logger.info(`🎉 ImageUpdate Job completed. ${job.id}`);
 });
 
 imageUpdateWorker.on('failed', (job, err) => {
-   console.error(`❌ Failed to process ImageUpdate job ${job.id}`, err);
+   logger.error(`❌ Failed to process ImageUpdate job ${job.id}`, err);
 });
 
 imageUpdateWorker.on('error', (err) => {
-   console.error('❌ ImageUpdate Worker connection error:', err);
+   logger.error('❌ ImageUpdate Worker connection error:', err);
 });
 
 imageUpdateWorker.on('closed', () => {
-   console.warn('⚠️ ImageUpdate Worker closed unexpectedly');
+   logger.error('⚠️ ImageUpdate Worker closed unexpectedly');
 });
 
 imageUpdateWorker.on('drained', () => {
-  //console.log("✨ ImageUpdate worker ---->  All jobs in the queue have been processed. Queue is empty.");
+   //logger.error("✨ ImageUpdate worker ---->  All jobs in the queue have been processed. Queue is empty.");
 });

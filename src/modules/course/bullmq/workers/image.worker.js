@@ -1,13 +1,16 @@
 import { createWorker } from "../../../../config/bullmq.js";
-import { constants } from "../../../../constants/statusCodes.js";
-import ApiError from "../../../../utils/apiError.js";
-import { imageUpload } from "../../../../utils/image.js";
+
+import { ApiError, constants, logger } from "@skillup/common-utils";
+
+import { imageUpload } from "../../utils/image.js";
 import { Course } from "../../models/course.model.js";
+
+
 
 //console.log('** image worker loads **');
 
 const processImageUploadJob = async (job) => {
-   console.log('📨 worker --> Processing ImageUpload job');
+   logger.info('📨 worker --> Processing ImageUpload job');
 
    const { imagePath, courseId } = job.data;
    try {
@@ -32,10 +35,10 @@ const processImageUploadJob = async (job) => {
       if (!updated)
          throw new ApiError(constants.SERVER_ERROR, 'Course not found or not updated');
 
-      console.log(`✅ Image uploaded and Course updated: ${courseId}`);
+      logger.info(`✅ Image uploaded and Course updated: ${courseId}`);
 
    } catch (err) {
-      console.error("❌ Image Worker error:", err);
+      logger.error("❌ Image Worker error:", err);
       throw err; // Always throw to let BullMQ retry the job
    }
 };
@@ -43,21 +46,21 @@ const processImageUploadJob = async (job) => {
 const imageWorker = createWorker('imageQueue', processImageUploadJob);
 
 imageWorker.on('completed', (job) => {
-   console.log(`🎉 Image worker completed job ${job.id}`);
+   logger.info(`🎉 Image worker completed job ${job.id}`);
 });
 
 imageWorker.on('failed', (job, err) => {
-   console.error(`❌ Failed to process image job ${job.id}`, err);
+   logger.error(`❌ Failed to process image job ${job.id}`, err);
 });
 
 imageWorker.on('error', (err) => {
-   console.error('❌ Image Worker connection error:', err);
+   logger.error('❌ Image Worker connection error:', err);
 });
 
 imageWorker.on('closed', () => {
-   console.warn('⚠️ Image Worker closed unexpectedly');
+   logger.warn('⚠️ Image Worker closed unexpectedly');
 });
 
 imageWorker.on('drained', () => {
-  //console.log("✨ Image worker ----> All jobs in the queue have been processed. Queue is empty.");
+   //logger.warn("✨ Image worker ----> All jobs in the queue have been processed. Queue is empty.");
 });

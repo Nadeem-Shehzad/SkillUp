@@ -1,6 +1,7 @@
 import { validationResult } from "express-validator";
 
-import { verifyUser } from "../../../utils/user.js";
+import { ApiError, constants } from "@skillup/common-utils";
+
 import {
    allCourses,
    createCourse,
@@ -22,8 +23,8 @@ import {
    searchCategoryService
 } from "../services/course.service.js";
 
-import ApiError, { errorMsg } from "../../../utils/apiError.js";
-import { constants } from "../../../constants/statusCodes.js";
+import { AuthClientService } from "../services/authClient.service.js";
+
 
 
 export const getAllCourses = async (req, res, next) => {
@@ -56,7 +57,7 @@ export const addCourse = async (req, res, next) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
          //console.log('❌ Validation Errors:', errors.array());
-         const errMsg = errorMsg(errors);
+         const errMsg = ApiError.errorMsg(errors);
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
 
@@ -243,9 +244,7 @@ export const publishCourse = async (req, res, next) => {
    try {
       const userId = req.user.id;
       const userRole = req.user.role;
-      const instructor = await verifyUser({ userId, userRole });
-
-      console.log(`Last id check --> ${instructor._id}`);
+      const instructor = await AuthClientService.userVerification({ userId, userRole });
 
       const courseId = req.params.courseId;
       const instructorId = instructor._id;
@@ -262,7 +261,7 @@ export const unpublishCourse = async (req, res, next) => {
    try {
       const userId = req.user.id;
       const userRole = req.user.role;
-      const instructor = await verifyUser({ userId, userRole });
+      const instructor = await AuthClientService.userVerification({ userId, userRole });
 
       const courseId = req.params.courseId;
       const instructorId = instructor._id;
@@ -279,13 +278,13 @@ export const updateCourse = async (req, res, next) => {
    try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-         const errMsg = errorMsg(errors);
+         const errMsg = ApiError.errorMsg(errors);
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
 
       const userId = req.user.id;
       const userRole = req.user.role;
-      const instructor = await verifyUser({ userId, userRole });
+      const instructor = await AuthClientService.userVerification({ userId, userRole });
 
       const courseId = req.params.id;
       const instructorId = instructor._id;
@@ -305,7 +304,7 @@ export const deleteCourse = async (req, res, next) => {
    try {
       const userId = req.user.id;
       const userRole = req.user.role;
-      const instructor = await verifyUser({ userId, userRole });
+      const instructor = await AuthClientService.userVerification({ userId, userRole });
 
 
       const courseId = req.params.id;
@@ -324,7 +323,7 @@ export const addCourseContent = async (req, res, next) => {
    try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-         const errMsg = errorMsg(errors);
+         const errMsg = ApiError.errorMsg(errors);
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
 
@@ -377,7 +376,7 @@ export const updateCourseContent = async (req, res, next) => {
    try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-         const errMsg = errorMsg(errors);
+         const errMsg = ApiError.errorMsg(errors);
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
 

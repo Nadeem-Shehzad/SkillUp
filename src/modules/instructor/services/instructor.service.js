@@ -1,7 +1,8 @@
 import cloudinary from "../../../config/cloudinary.js";
-import { constants } from "../../../constants/statusCodes.js";
-import ApiError from "../../../utils/apiError.js";
-import { imageUpload } from "../../../utils/image.js";
+
+import { ApiError, constants } from "@skillup/common-utils";
+
+import { imageUpload } from "../utils/image.js";
 import User from "../../auth/models/auth.model.js";
 import { Instructor } from "../models/instructor.model.js";
 

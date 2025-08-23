@@ -4,6 +4,10 @@ import { AuthClientService } from "./authClient.service.js";
 
 export const InstructorPublicService = {
 
+   createInstructor(userId) {
+      return Instructor.create({ user: userId });
+   },
+
    async getInstructorData(instructorId) {
       const instructor = await Instructor.findById(instructorId)
          .select('user bio expertise qualifications totalCourses totalStudents averageRating status');
@@ -22,8 +26,7 @@ export const InstructorPublicService = {
    },
 
    async checkInstructorExists(instructorId) {
-      const instructor = await Instructor.findOne({ user: instructorId });
-      return instructor;
+      return Instructor.findOne({ user: instructorId });
    }
 
 }

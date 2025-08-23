@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import { logger } from "@skillup/common-utils";
 
 const redis = new Redis({
   host: 'redis-19673.c100.us-east-1-4.ec2.redns.redis-cloud.com',
@@ -9,11 +10,11 @@ const redis = new Redis({
 });
 
 redis.on('connect', () => {
-  console.log('✅ Connected to Redis Cloud via TLS');
+  logger.info('✅ Connected to Redis Cloud via TLS.');
 });
 
 redis.on('error', (err) => {
-  console.error('❌ ioredis error:', err);
+  logger.error('❌ ioredis error:', err);
 });
 
 

@@ -1,16 +1,28 @@
 import User from "../models/auth.model.js";
 
+import { ApiError } from "@skillup/common-utils";
+import { constants } from "@skillup/common-utils";
+
 
 export const AuthPublicService = {
-    async getUserInfo(userId) {
-        const user = await User.findById(userId).select('name email isVerified');
-        // add try-catch here to caught user nto found error!
+   
+   getUserInfo(userId) {
+      return User.findById(userId).select('name email isVerified');
+   },
 
-        // console.log('***********');
-        // console.log(`inside user service --> ${userId}`);
-        // console.log(`inside user service --> ${user}`);
-        // console.log('***********');
+   
+   async verifyUser({ userId, userRole }) {
 
-        return user;
-    }
+      const user = await User.findById(userId);
+
+      if (!user) {
+         throw new ApiError(constants.NOT_FOUND, `User not found!`);
+      }
+
+      if (user.role !== userRole) {
+         throw new ApiError(constants.FORBIDDEN, `Invalid role: ${userRole}`);
+      }
+
+      return user;
+   }
 }

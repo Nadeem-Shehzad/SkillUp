@@ -1,4 +1,8 @@
-import { generateToken } from "../../../utils/token.js";
+//import { generateToken } from "../../../utils/token.js";
+
+import { tokenUtils } from '@skillup/common-utils';
+
+
 import {
    createUser,
    findLoginUser,
@@ -27,7 +31,7 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
    try {
       const user = await validateUser(req.body);
-      const { accessToken, refreshToken, userId } = await generateToken(user);
+      const { accessToken, refreshToken, userId } = await tokenUtils.generateToken(user);
 
       res.status(200).json({ success: true, message: 'User LogedIn.', data: { accessToken, refreshToken, userId } });
 
@@ -84,15 +88,13 @@ export const logout = async (req, res, next) => {
    try {
       const isRDataDeleted = await handleLogout(req);
 
-      console.log(`isDeleted Key --> ${isRDataDeleted}`);
-
       if (isRDataDeleted) {
          res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: true,
             sameSite: 'Strict'
          });
-         
+
          res.status(200).json({ success: true, message: 'User LogedOut.', data: null });
       } else {
          res.status(500).json({ success: false, message: 'Error while Logout!', data: null });

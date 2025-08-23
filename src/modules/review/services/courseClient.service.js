@@ -4,15 +4,15 @@ import { CoursePublicService } from "../../course/index.js";
 
 export const CourseClientService = {
 
-   async courseExists(courseId) {
+   courseExists(courseId) {
       return CoursePublicService.courseExists(courseId);
    },
 
-   async updateCourseRating(courseId, avgRating, totalReviews) {
+   updateCourseRating(courseId, avgRating, totalReviews) {
       return CoursePublicService.updateCourseRating(courseId, avgRating, totalReviews);
    },
 
-   async getCourseSummary(courseId) {
+   getCourseSummary(courseId) {
       return CoursePublicService.getCourseSummary(courseId);
    }
 }

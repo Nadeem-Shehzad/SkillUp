@@ -1,11 +1,11 @@
+import { ApiError, constants, logger } from "@skillup/common-utils";
+
 import { Course } from "../models/course.model.js";
 import { addImageUpdateJob, addImageUploadJob } from "../bullmq/jobs/image.job.js";
 import { CourseContent } from "../models/courseContent.model.js";
-import ApiError from "../../../utils/apiError.js";
-import { constants } from "../../../constants/statusCodes.js";
 import { addVideoUpdateJob, addVideoUploadJob } from "../bullmq/jobs/video.job.js";
 import { Instructor } from "../../instructor/models/instructor.model.js";
-import { deleteVideo } from "../../../utils/video.js";
+import { deleteVideo } from "../utils/video.js";
 import { redis, REDIS_DATA_EXPIRY_TIME, runInTransaction, NODE_ENV } from "../../../config/index.js";
 
 
@@ -16,7 +16,7 @@ export const allCourses = async ({ page, limit }) => {
    const cachedData = await redis.get(key);
 
    if (cachedData) {
-      console.log('data coming from redis');
+      logger.info('data coming from redis');
       return JSON.parse(cachedData);
    }
 
@@ -220,7 +220,7 @@ export const allInstructors = async ({ page, limit }) => {
    const cachedData = await redis.get(key);
 
    if (cachedData) {
-      console.log('data coming from redis...');
+      logger.info('data coming from redis');
       return JSON.parse(cachedData);
    }
 
@@ -238,7 +238,7 @@ export const singleInstructorCourses = async ({ instructorId, page, limit }) => 
    const cachedData = await redis.get(key);
 
    if (cachedData) {
-      console.log('data coming from redis...');
+      logger.info('data coming from redis');
       return JSON.parse(cachedData);
    }
 
@@ -396,14 +396,13 @@ export const get_CourseContents = async ({ courseId, page, limit }) => {
    const cachedData = await redis.get(key);
 
    if (cachedData) {
-      console.log('data coming from redis...');
+      logger.info('data coming from redis');
       return JSON.parse(cachedData);
    }
 
    const contents = await CourseContent.find({ courseId }).skip((page - 1) * limit).limit(limit);
 
    await redis.set(key, JSON.stringify(contents), 'EX', REDIS_DATA_EXPIRY_TIME);
-   console.log('***** inside get contents service *****');
 
    return contents;
 }

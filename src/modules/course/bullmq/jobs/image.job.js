@@ -1,9 +1,10 @@
 import { imageQueue, imageUpdateQueue } from "../queues/image.queue.js";
+import { logger } from "@skillup/common-utils";
 
 
 export const addImageUploadJob = async ({ imagePath, courseId }) => {
 
-   console.log('📥 Adding image job to queue...');
+   logger.info('📥 Adding image job to queue...');
 
    await imageQueue.add('uploadImage', { imagePath, courseId },
       {
@@ -20,13 +21,14 @@ export const addImageUploadJob = async ({ imagePath, courseId }) => {
    // const jobCounts = await welcomeEmailQueue.getJobCounts();
    // console.log('📊 Job counts:', jobCounts);
 
-   console.log('✅ Job added to image queue');
+   logger.info('✅ Job added to image queue');
 };
 
 
 export const addImageUpdateJob = async ({ newImagePath, oldImagePID, courseId }) => {
-   
-   console.log('📥 Adding imageUpdate job to queue...');
+
+   logger.info('📥 Adding imageUpdate job to queue...');
+
    await imageUpdateQueue.add('UpdateImage', { newImagePath, oldImagePID, courseId }, {
       attempts: 3,
       backoff: {
@@ -37,5 +39,5 @@ export const addImageUpdateJob = async ({ newImagePath, oldImagePID, courseId })
       removeOnFail: false,
    });
 
-    console.log('✅ Job added to imageUpdate queue');
+   logger.info('✅ Job added to imageUpdate queue');
 }

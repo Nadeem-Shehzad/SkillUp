@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/index.js';
-import ApiError from '../utils/apiError.js';
-import { constants } from '../constants/statusCodes.js';
+import { ApiError, constants } from "@skillup/common-utils";
 import User from '../modules/auth/models/auth.model.js';
+
 
 
 export const ValidateToken = async (req, res, next) => {

@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import { constants } from '../constants/statusCodes.js';
+import { constants } from "@skillup/common-utils";
 
 
 export const validate = (req, res, next) => {

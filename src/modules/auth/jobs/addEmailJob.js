@@ -1,9 +1,10 @@
+import { logger } from "@skillup/common-utils";
 
 import { mailQueue } from '../bullmq/queues/email.queue.js';
 
 export const addEmailJob = async ({ to, subject, data }) => {
 
-  console.log('📥 Adding email job to queue...');
+  logger.info('📥 Adding email job to queue...');
 
   await mailQueue.add('sendEmail', { to, subject, data },
     {
@@ -15,5 +16,5 @@ export const addEmailJob = async ({ to, subject, data }) => {
   // const jobCounts = await welcomeEmailQueue.getJobCounts();
   // console.log('📊 Job counts:', jobCounts);
 
-  console.log('✅ Job added to email queue');
+  logger.info('✅ Job added to email queue');
 };

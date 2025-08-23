@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
-import { constants } from "../../../constants/statusCodes.js";
-import ApiError from "../../../utils/apiError.js";
+
+import { ApiError, constants } from "@skillup/common-utils";
+
 import { Review } from "../models/review.model.js";
 
 

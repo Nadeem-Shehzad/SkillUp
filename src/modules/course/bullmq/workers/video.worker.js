@@ -1,7 +1,8 @@
 import { createWorker } from "../../../../config/index.js";
-import { constants } from "../../../../constants/statusCodes.js";
-import ApiError from "../../../../utils/apiError.js";
-import { videoUpload } from "../../../../utils/video.js";
+
+import { ApiError, constants, logger } from "@skillup/common-utils";
+
+import { videoUpload } from "../../utils/video.js";
 import { CourseContent } from "../../models/courseContent.model.js";
 
 //console.log('** video worker loads **');
@@ -33,32 +34,32 @@ const processVideoUploadJob = async (job) => {
       if (!updated)
          throw new ApiError(constants.SERVER_ERROR, 'CourseContent not found or not updated')
 
-      console.log(`✅ video uploaded and CourseContent updated: ${contentId}`);
+      logger.info(`✅ video uploaded and CourseContent updated: ${contentId}`);
 
    } catch (error) {
-      console.error("❌ Video Worker error:", err);
-      throw error; // Always throw to let BullMQ retry the job
+      logger.error("❌ Video Worker error:", err);
+      throw error; 
    }
 }
 
 const videoWorker = createWorker('videoQueue', processVideoUploadJob);
 
 videoWorker.on('completed', (job) => {
-   console.log(`🎉 Video worker completed job ${job.id}`);
+   logger.info(`🎉 Video worker completed job ${job.id}`);
 });
 
 videoWorker.on('failed', (job, err) => {
-   console.error(`❌ Failed to process video job ${job.id}`, err);
+   logger.error(`❌ Failed to process video job ${job.id}`, err);
 });
 
 videoWorker.on('error', (err) => {
-   console.error('❌ Video Worker connection error:', err);
+   logger.error('❌ Video Worker connection error:', err);
 });
 
 videoWorker.on('closed', () => {
-   console.warn('⚠️ Video Worker closed unexpectedly');
+   logger.warn('⚠️ Video Worker closed unexpectedly');
 });
 
 videoWorker.on('drained', () => {
-  //console.log("✨ Video worker ---->  All jobs in the queue have been processed. Queue is empty.");
+   //logger.error("✨ Video worker ---->  All jobs in the queue have been processed. Queue is empty.");
 });

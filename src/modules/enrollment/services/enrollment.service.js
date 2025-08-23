@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
-import ApiError from "../../../utils/apiError.js";
-import { constants } from "../../../constants/statusCodes.js";
+
+import { ApiError, constants } from "@skillup/common-utils";
+
 import { Course } from "../../course/models/course.model.js";
 import { Student } from "../../student/index.js";
 import { Enrollment } from "../models/enrollment.model.js";
+
 import {
    newEnrollmentsThisMonth,
    overallStats,

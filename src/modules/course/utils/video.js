@@ -1,6 +1,8 @@
 
-import cloudinary from "../config/cloudinary.js"
-import { constants } from "../constants/statusCodes.js";
+import cloudinary from "../../../config/cloudinary.js";
+
+import { ApiError } from "@skillup/common-utils";
+import { constants } from "@skillup/common-utils";
 
 
 export const videoUpload = async (videoPath) => {

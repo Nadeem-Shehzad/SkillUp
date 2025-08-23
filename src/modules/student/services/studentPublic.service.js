@@ -1,8 +1,15 @@
+
 import { Student } from "../models/student.model.js";
 
+
 export const StudentPublicService = {
-   async studentExists(studentId) {
-      const student = await Student.findOne({ user: studentId });
-      return student;
-   }
+
+   createStudent(userId) {
+      return Student.create({ user: userId });
+   },
+
+   studentExists(studentId) {
+      return Student.findOne({ user: studentId });
+   },
+
 }

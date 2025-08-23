@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-import { constants } from "../../../constants/statusCodes.js";
-import ApiError from "../../../utils/apiError.js";
+import { ApiError, constants } from "@skillup/common-utils";
+
 import { CourseClientService } from "../services/courseClient.service.js";
 import { EnrollmentClientService } from "../services/enrollmentClient.service.js";
 import { StudentClientService } from "../services/studentClient.service.js";

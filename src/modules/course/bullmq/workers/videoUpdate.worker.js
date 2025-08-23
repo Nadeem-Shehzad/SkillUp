@@ -1,7 +1,8 @@
 import { createWorker } from "../../../../config/index.js";
-import { constants } from "../../../../constants/statusCodes.js";
-import ApiError from "../../../../utils/apiError.js";
-import { deleteVideo, videoUpload } from "../../../../utils/video.js";
+
+import { ApiError, constants, logger } from "@skillup/common-utils";
+
+import { deleteVideo, videoUpload } from "../../utils/video.js";
 import { CourseContent } from "../../models/courseContent.model.js";
 
 
@@ -33,10 +34,10 @@ const processVideoUpdateJob = async (job) => {
       if (!updated)
          throw new ApiError(constants.SERVER_ERROR, 'Content not found or not updated');
 
-      console.log(`✅ Video and Content updated: ${contentId}`);
+      logger.info(`✅ Video and Content updated: ${contentId}`);
 
    } catch (error) {
-      console.error("❌ VideoUpdate Worker error:", error);
+      logger.error("❌ VideoUpdate Worker error:", error);
       throw error;
    }
 }
@@ -44,21 +45,21 @@ const processVideoUpdateJob = async (job) => {
 const videoUpdateWorker = createWorker('videoUpdateQueue', processVideoUpdateJob);
 
 videoUpdateWorker.on('completed', (job) => {
-   console.log(`🎉 VideoUpdate Job completed. ${job.id}`);
+   logger.info(`🎉 VideoUpdate Job completed. ${job.id}`);
 });
 
 videoUpdateWorker.on('failed', (job, err) => {
-   console.error(`❌ Failed to process VideoUpdate job ${job.id}`, err);
+   logger.error(`❌ Failed to process VideoUpdate job ${job.id}`, err);
 });
 
 videoUpdateWorker.on('error', (err) => {
-   console.error('❌ VideoUpdate Worker connection error:', err);
+   logger.error('❌ VideoUpdate Worker connection error:', err);
 });
 
 videoUpdateWorker.on('closed', () => {
-   console.warn('⚠️ VideoUpdate Worker closed unexpectedly');
+   logger.warn('⚠️ VideoUpdate Worker closed unexpectedly');
 });
 
 videoUpdateWorker.on('drained', () => {
-  //console.log("✨ VideoUpdate worker ---->  All jobs in the queue have been processed. Queue is empty.");
+   //logger.warn("✨ VideoUpdate worker ---->  All jobs in the queue have been processed. Queue is empty.");
 });

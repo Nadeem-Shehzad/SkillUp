@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import { logger } from "@skillup/common-utils";
+
 import { MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASSWORD } from '../config/env.js';
 
 
@@ -23,8 +25,8 @@ export const sendEmail = async ({ to, subject, data }) => {
          html: data,
       });
 
-      console.log('✅ Email sent:', info.messageId);
+      logger.info('✅ Email sent:', info.messageId);
    } catch (error) {
-      console.error('❌ Failed to send otp email:', error);
+      logger.info('❌ Failed to send otp email:', error);
    }
 }

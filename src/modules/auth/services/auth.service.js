@@ -1,18 +1,24 @@
-import ApiError from "../../../utils/apiError.js";
-import { comparePassword, hashPassword } from "../../../utils/password.js"
+import jwt from 'jsonwebtoken';
+
+import {
+   ApiError,
+   constants,
+   tokenUtils,
+   logger
+} from "@skillup/common-utils";
+
+
+import { comparePassword, hashPassword } from "../utils/password.js";
 import User from "../models/auth.model.js";
-import { constants } from "../../../constants/statusCodes.js";
-import { imageUpload } from "../../../utils/image.js";
-import { sendEmail } from "../../../utils/email.js";
+import { imageUpload } from "../utils/image.js";
+import { sendEmail } from "../../../notifications/email.js";
 import { redis } from "../../../config/index.js";
 import randomstring from 'randomstring';
-import { verifyToken } from "../../../utils/token.js";
-import jwt from 'jsonwebtoken';
 import { JWT_SECRET, TOKEN_EXPIRES_IN } from "../../../config/env.js";
-import { Student } from "../../student/models/student.model.js";
-import { Instructor } from "../../instructor/models/instructor.model.js";
-import {addEmailJob} from '../jobs/addEmailJob.js'
+import { addEmailJob } from '../jobs/addEmailJob.js';
 
+import { StudentClientService } from "./studentClient.service.js";
+import { InstructorClientService } from "./instructorClient.service.js";
 
 
 
@@ -32,7 +38,6 @@ export const createUser = async (req) => {
    }
 
    if (req.files && req.files.image) {
-      console.log('inside register...');
       const imagePath = req.files.image;
       imageUploadData = await imageUpload(imagePath);
    }
@@ -47,12 +52,14 @@ export const createUser = async (req) => {
    });
 
    if (user.role === 'student') {
-      await Student.create({ user: user._id });
+      await StudentClientService.createStudent(user._id);
    }
 
    if (user.role === 'instructor') {
-      await Instructor.create({ user: user._id });
+      await InstructorClientService.createInstructor(user._id);
    }
+
+   logger.info("User created successfully", { userId: user._id });
 
    return user;
 }
@@ -73,6 +80,7 @@ export const validateUser = async ({ email, password }) => {
    return user;
 }
 
+
 export const findLoginUser = async ({ id }) => {
    const user = await User.findById(id);
    if (!user) {
@@ -81,6 +89,7 @@ export const findLoginUser = async ({ id }) => {
 
    return user;
 }
+
 
 export const updatePassword = async (user, reqBody) => {
 
@@ -161,7 +170,7 @@ export const handleRefreshToken = async (req) => {
       throw new ApiError(constants.UNAUTHORIZED, 'No Refresh Token');
    }
 
-   const decoded = verifyToken(token);
+   const decoded = tokenUtils.verifyToken(token);
    const userId = decoded.user.id;
 
    const storedRFToken = await redis.get(`rfToken:${userId}`);

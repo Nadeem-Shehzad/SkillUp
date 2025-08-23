@@ -1,5 +1,5 @@
-import { constants } from "../constants/statusCodes.js"
-import ApiError from "../utils/apiError.js"
+import { ApiError } from "@skillup/common-utils";
+import { constants } from "@skillup/common-utils";
 
 export const checkRole = (...allowedRoles) => {
    return async (req, res, next) => {
