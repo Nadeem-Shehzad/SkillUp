@@ -7,5 +7,13 @@ export const CourseClientService = {
 
    findCourseInstructor({ courseId }) {
       return CoursePublicService.findCourseInstructor({ courseId });
-   }
+   },
+
+   findInstructorCoursesIds(instrcutorId){
+      return CoursePublicService.getInstructorCourseIds(instrcutorId);
+   },
+
+   findInstructorCoursesIdsAndNames(instrcutorId){
+      return CoursePublicService.getInstructorCourseIdsAndNames(instrcutorId);
+   },
 }

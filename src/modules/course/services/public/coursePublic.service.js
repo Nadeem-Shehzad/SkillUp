@@ -38,6 +38,15 @@ export const CoursePublicService = {
       const courseName = course.title;
 
       return { courseName, instructor };
+   },
+
+   async getInstructorCourseIds(instrcutorId) {
+      const courses = await Course.find({ instructor: instrcutorId });
+      return courses.map((c) => c._id);
+   },
+
+   async getInstructorCourseIdsAndNames(instrcutorId) {
+      return await Course.find({ instructor: instrcutorId }).select('_id title');
    }
 
 };

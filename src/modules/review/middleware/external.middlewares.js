@@ -95,6 +95,44 @@ export const checkInstructorExists = async (req, res, next) => {
 }
 
 
+export const checkReviewedInstructor = async (req, res, next) => {
+   try {
+      const instructorId = req.params.instructorId;
+      if (!mongoose.Types.ObjectId.isValid(instructorId)) {
+         throw new ApiError(constants.VALIDATION_ERROR, 'Invalid Instructor ID!');
+      }
+
+      const instructor = await InstructorClientService.checkInstructorExists(instructorId);
+      if (!instructor) {
+         throw new ApiError(constants.NOT_FOUND, 'Instructor not Found!');
+      }
+
+      next();
+
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const enrolledWithInstructor = async (req, res, next) => {
+   try {
+      const studentId = req.user.id;
+      const instructorId = req.params.instructorId;
+
+      const studentExists = await StudentClientService.enrolledWithInstructor(studentId, instructorId);
+      if (!studentExists) {
+         throw new ApiError(constants.FORBIDDEN, 'Sorry, you are not enrolled in any course of this instructor!');
+      }
+
+      next();
+
+   } catch (error) {
+      next(error);
+   }
+}
+
+
 export const checkCourseOwner = async (req, res, next) => {
    try {
       const instructorId = req.user.id;

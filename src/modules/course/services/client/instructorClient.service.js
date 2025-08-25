@@ -6,7 +6,11 @@ export const InstructorClientService = {
       return await InstructorPublicService.getInstructorData(instructorId);
    },
 
-   getAllInstructorsData({ page, limit }) {
+   async getAllInstructorsData({ page, limit }) {
       return InstructorPublicService.getAllInstructors({ page, limit });
+   },
+
+   async updateCoursesCount(instrcutorId, totalCourses){
+      return InstructorPublicService.updateInstructorCourseCounting(instrcutorId, totalCourses);
    }
 }

@@ -86,6 +86,9 @@ export const createCourse = async (req) => {
       });
    }
 
+   const totalCourses = await Course.countDocuments({ instructor });
+   await InstructorClientService.updateCoursesCount(instructor, totalCourses);
+
    return course;
 }
 
@@ -337,6 +340,9 @@ export const delete_Course = async ({ instructorId, courseId }) => {
 
       await CourseContent.deleteMany({ courseId: courseId }).session(session);
       await Course.findByIdAndDelete(courseId).session(session);
+
+      const totalCourses = await Course.countDocuments({ instructorId }).session(session);
+      await InstructorClientService.updateCoursesCount(instructorId, totalCourses).session(session);
 
       return true;
    });

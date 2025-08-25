@@ -1,17 +1,19 @@
 import mongoose from "mongoose";
 
-import { ApiError, constants } from "@skillup/common-utils";
+import { ApiError, constants, logger } from "@skillup/common-utils";
 
 import { Review } from "../models/courseReview.model.js";
-import { 
-   totalStats, 
-   ratingDistribution, 
-   latestReviews 
+import { InstructorReview } from "../models/instructorReview.model.js";
+
+import {
+   totalStats,
+   ratingDistribution,
+   latestReviews
 } from "../pipelines/review.pipelines.js";
 
 import { AuthClientService } from "./client/authClient.service.js";
 import { CourseClientService } from "./client/courseClient.service.js";
-
+import { InstructorClientService } from "./client/instructorClient.service.js";
 
 
 
@@ -147,13 +149,74 @@ export const getMyReviewsService = async ({ studentId }) => {
 }
 
 
+export const addInstructorReviewService = async ({ studentId, studentAuthID, instructorId, rating, comment }) => {
 
+   const reviewExists = await InstructorReview.findOne({
+      instructorId,
+      studentId
+   });
+
+   if (reviewExists) {
+      throw new ApiError(constants.CONFLICT, "Sorry, You already reviewed this Instructor!");
+   }
+
+   const instructorData = await InstructorClientService.getInstructorData(instructorId);
+   const user = await AuthClientService.getUserInfo(studentAuthID);
+
+   const review = await InstructorReview.create({
+      studentId,
+      studentName: user.name,
+      instructorId,
+      instructorName: instructorData.name,
+      rating,
+      comment
+   });
+
+   const reviews = await InstructorReview.find({ instructorId });
+   const avgRating = parseFloat(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1);
+
+   await InstructorClientService.updateInstructorRating(instructorId, avgRating);
+
+   return review;
+}
+
+
+export const getInstructorReviewService = async ({ instructorId }) => {
+   const reviews = await InstructorReview.find({ instructorId });
+   return reviews;
+}
+
+
+export const updateInstructorReviewService = async ({ instructorId, reviewId, dataToUpdate }) => {
+
+   const updatedReviews = await InstructorReview.findByIdAndUpdate(
+      reviewId,
+      dataToUpdate,
+      { new: true }
+   );
+
+   const reviews = await InstructorReview.find({ instructorId });
+   const avgRating = parseFloat(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1);
+
+   await InstructorClientService.updateInstructorRating(instructorId, avgRating);
+
+   return updatedReviews;
+}
+
+
+export const delInstructorReviewService = async ({ instructorId, reviewId }) => {
+   const delreviews = await InstructorReview.findByIdAndDelete(reviewId);
+
+   const reviews = await InstructorReview.find({ instructorId });
+   const avgRating = parseFloat(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1);
+
+   await InstructorClientService.updateInstructorRating(instructorId, avgRating);
+   return delreviews;
+}
 
 
 // instructor
 export const getMyCourseReviewsService = async ({ courseId }) => {
-
    const reviews = await Review.find({ courseId });
-
    return reviews;
 }

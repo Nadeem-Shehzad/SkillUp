@@ -1,5 +1,6 @@
 
 import { Student } from "../../models/student.model.js";
+import { EnrollmentClientService } from "../client/enrollmentClient.service.js";
 
 
 export const StudentPublicService = {
@@ -12,4 +13,7 @@ export const StudentPublicService = {
       return Student.findOne({ user: studentId });
    },
 
+   enrolledWithInstructor(studentId, instructorId) {
+      return EnrollmentClientService.enrolledWithInstructor(studentId, instructorId);
+   }
 }

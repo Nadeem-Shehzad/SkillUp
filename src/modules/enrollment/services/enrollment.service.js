@@ -12,6 +12,8 @@ import {
 
 import { CourseClientService } from "./client/courseClient.service.js";
 import { StudentClientService } from "./client/studentClient.service.js";
+import { InstructorClientService } from "./client/instructorClient.service.js";
+import { EnrollmentPublicService } from "./public/enrollmentPublic.service.js";
 
 
 
@@ -28,6 +30,11 @@ export const topEnrollmentCoursesService = async () => {
    ]);
 
    return enrolledStudents;
+}
+
+
+export const getInstructorAllCoursesAndEnrollmentsService = async (instrcutorId) => {
+   return await EnrollmentPublicService.getInstructorCoursesAndEnrollmentsStats(instrcutorId);
 }
 
 
@@ -53,6 +60,8 @@ export const courseEnrollmentService = async ({ userId, courseId }) => {
 
    student.enrolledCourses.push(courseId);
    await student.save();
+
+   await InstructorClientService.updateInstructorEnrollmentStats(course.instructor);
 
    return enrolledCourse;
 }
@@ -113,7 +122,7 @@ export const getEnrolledStudentsService = async ({ courseId, instructorId }) => 
    }
 
    if (course.instructor.user._id.toString() !== instructorId.toString()) {
-      throw new ApiError(constants.FORBIDDEN, 'Not allowed to see enrollments of another instructor\'s course!');
+      throw new ApiError(constants.FORBIDDEN, 'Not allowed to see enrollments of other instructor\'s course!');
    }
 
    const enrolledStudents = await Enrollment.find({ courseId })

@@ -20,17 +20,22 @@ import {
    checkCourseOwner,
    checkEnrollment,
    checkInstructorExists,
-   checkStudentExists
+   checkReviewedInstructor,
+   checkStudentExists,
+   enrolledWithInstructor
 } from '../middleware/external.middlewares.js';
 
 import {
    checkReviewExists,
+   IR_isValidStudent,
    isValidStudent
 } from "../middleware/review.middlewares.js";
 
-import { 
-   addReviewsANDRating, 
-   getReviewsANDRating 
+import {
+   addReviewsANDRating,
+   deleteReviewsANDRating,
+   getReviewsANDRating,
+   updateReviewsANDRating
 } from "../controllers/instructorReview.controller.js";
 
 
@@ -44,8 +49,8 @@ router.route('/courses/top-rated')
 
 //student
 router.route('/my-reviews')
-.get(
-   ValidateToken,
+   .get(
+      ValidateToken,
       checkStudentExists,
       checkRole('student'),
       myReviews
@@ -83,9 +88,36 @@ router.route('/:reviewId')
 
 
 // instructor's review-rating
-router.route('/instructor/:id/reviews-rating')
-   .post(ValidateToken, checkRole('student'), addReviewsANDRating)
+router.route('/instructor/:instructorId/reviews-rating')
+   .post(
+      ValidateToken,
+      checkStudentExists,
+      checkRole('student'),
+      checkReviewedInstructor,
+      enrolledWithInstructor,
+      addReviewsANDRating
+   )
    .get(getReviewsANDRating);
+
+
+router.route('/instructor/:reviewId/reviews-rating')
+   .put(
+      ValidateToken,
+      checkStudentExists,
+      checkRole('student'),
+      IR_isValidStudent,
+      updateReviewsANDRating
+   );
+
+
+router.route('/instructor/:reviewId/reviews-rating')
+   .delete(
+      ValidateToken,
+      checkStudentExists,
+      checkRole('student'),
+      IR_isValidStudent,
+      deleteReviewsANDRating
+   );
 
 
 

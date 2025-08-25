@@ -26,12 +26,30 @@ export const InstructorPublicService = {
    },
 
    checkInstructorExists(instructorId) {
-      return Instructor.findOne({ user: instructorId });
+      return Instructor.findById(instructorId);
    },
 
    getAllInstructors({ page, limit }) {
       return Instructor.find({})
          .populate('user', 'name email isVerified')
          .skip((page - 1) * limit).limit(limit);
-   }
+   },
+
+   updateInstructorRating(instrcutorId, avgRating) {
+      return Instructor.findByIdAndUpdate(instrcutorId, {
+         averageRating: avgRating
+      });
+   },
+
+   updateInstructorCourseCounting(instrcutorId, totalCourses) {
+      return Instructor.findByIdAndUpdate(instrcutorId, {
+         totalCourses
+      });
+   },
+
+   updateInstructorStudentCounting(instrcutorId, totalStudents) {
+      return Instructor.findByIdAndUpdate(instrcutorId, {
+         totalStudents
+      });
+   },
 }

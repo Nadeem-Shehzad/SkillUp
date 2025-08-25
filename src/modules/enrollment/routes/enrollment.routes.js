@@ -14,6 +14,7 @@ import {
    admin_deleteEnrollment,
    admin_studentEnrollments,
    admin_updateEnrollment,
+   getInstructorAllCoursesAndEnrollments,
 } from "../controllers/enrollment.controller.js";
 
 
@@ -22,6 +23,7 @@ const router = express.Router();
 
 //public
 router.route('/courses/top-enrollments').get(topEnrollmentCourses);
+router.route('/instructor/:instructorId/count').get(getInstructorAllCoursesAndEnrollments);
 
 
 // student

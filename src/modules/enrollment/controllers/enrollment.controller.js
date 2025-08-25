@@ -9,6 +9,7 @@ import {
    getEnrolledCourseDetailsService,
    getEnrolledCoursesService,
    getEnrolledStudentsService,
+   getInstructorAllCoursesAndEnrollmentsService,
    topEnrollmentCoursesService,
 } from "../services/enrollment.service.js";
 
@@ -24,6 +25,21 @@ export const topEnrollmentCourses = async (req, res, next) => {
       next(error);
    }
 }
+
+
+export const getInstructorAllCoursesAndEnrollments = async (req, res, next) => {
+   try {
+
+      const instructorId = req.params.instructorId;
+      const instructorCoursesAndEnrollments = await getInstructorAllCoursesAndEnrollmentsService(instructorId);
+
+      return res.status(201).json({ success: true, message: 'Instructor Courses and Enrollment Data.', data: instructorCoursesAndEnrollments });
+   } catch (error) {
+      next(error);
+   }
+}
+
+
 
 
 // student

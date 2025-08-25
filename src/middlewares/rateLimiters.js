@@ -20,6 +20,6 @@ export const authRateLimiter = rateLimit({
    max: 20,
    message: {
       success: false,
-      message: "Too many login attempts. Try again in 10 minutes."
+      message: "Too many attempts. Try again in 10 minutes."
    }
 }); 

@@ -1,5 +1,4 @@
 import { validationResult } from "express-validator";
-
 import { ApiError, constants } from "@skillup/common-utils";
 
 import {
@@ -56,7 +55,6 @@ export const addCourse = async (req, res, next) => {
    try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-         //console.log('❌ Validation Errors:', errors.array());
          const errMsg = ApiError.errorMsg(errors);
          throw new ApiError(constants.VALIDATION_ERROR, errMsg);
       }
@@ -91,7 +89,6 @@ export const addCourse = async (req, res, next) => {
 //       next(error);
 //    }
 //}
-
 
 export const getAllInstructors = async (req, res, next) => {
    try {

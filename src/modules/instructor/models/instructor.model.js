@@ -7,51 +7,43 @@ const instructorSchema = new mongoose.Schema(
          ref: 'User',
          required: true
       },
-
       bio: {
          type: String,
          trim: true,
       },
-
       expertise: {
          type: [String] // e.g., ['JavaScript', 'Data Science']
       },
-
       qualifications: {
          type: [String],
       },
-
       socialLinks: {
          website: String,
          linkedin: String,
          twitter: String,
          github: String,
       },
-
       totalCourses: {
          type: Number,
          default: 0,
       },
-
       totalStudents: {
          type: Number,
          default: 0,
       },
-
       averageRating: {
          type: Number,
          default: 0,
       },
-
+      totalReviews: {
+         type: Number,
+         default: 0
+      },
       status: {
          type: String,
          enum: ['pending', 'approved', 'rejected'],
          default: 'pending',
       },
-      profilePendingApproval: {
-         type: Boolean,
-         default: false,
-      }
    },
    {
       timestamps: true,

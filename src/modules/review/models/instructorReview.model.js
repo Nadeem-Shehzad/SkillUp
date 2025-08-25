@@ -6,11 +6,13 @@ const instructorReviewSchema = new mongoose.Schema({
       ref: "Instructor",
       required: true
    },
+   instructorName: String,
    studentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Student",
       required: true
    },
+   studentName: String,
    rating: {
       type: Number,
       min: 1,
