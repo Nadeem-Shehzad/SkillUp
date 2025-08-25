@@ -1,5 +1,5 @@
 
-import { Student } from "../models/student.model.js";
+import { Student } from "../../models/student.model.js";
 
 
 export const StudentPublicService = {

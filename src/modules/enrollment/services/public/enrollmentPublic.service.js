@@ -1,4 +1,4 @@
-import { Enrollment } from "../models/enrollment.model.js";
+import { Enrollment } from "../../models/enrollment.model.js";
 
 
 export const EnrollmentPublicService = {

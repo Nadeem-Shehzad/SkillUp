@@ -1,5 +1,5 @@
 
-import { StudentPublicService } from "../../student/index.js";
+import { StudentPublicService } from "../../../student/index.js";
 
 export const StudentClientService = {
    createStudent(userId) {

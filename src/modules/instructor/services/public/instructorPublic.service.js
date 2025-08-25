@@ -1,5 +1,5 @@
-import { Instructor } from "../models/instructor.model.js";
-import { AuthClientService } from "./authClient.service.js";
+import { Instructor } from "../../models/instructor.model.js";
+import { AuthClientService } from "../client/authClient.service.js";
 
 
 export const InstructorPublicService = {
@@ -25,8 +25,13 @@ export const InstructorPublicService = {
       return instructorData;
    },
 
-   async checkInstructorExists(instructorId) {
+   checkInstructorExists(instructorId) {
       return Instructor.findOne({ user: instructorId });
-   }
+   },
 
+   getAllInstructors({ page, limit }) {
+      return Instructor.find({})
+         .populate('user', 'name email isVerified')
+         .skip((page - 1) * limit).limit(limit);
+   }
 }

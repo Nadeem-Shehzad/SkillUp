@@ -17,8 +17,8 @@ import randomstring from 'randomstring';
 import { JWT_SECRET, TOKEN_EXPIRES_IN } from "../../../config/env.js";
 import { addEmailJob } from '../jobs/addEmailJob.js';
 
-import { StudentClientService } from "./studentClient.service.js";
-import { InstructorClientService } from "./instructorClient.service.js";
+import { StudentClientService } from "./client/studentClient.service.js";
+import { InstructorClientService } from "./client/instructorClient.service.js";
 
 
 

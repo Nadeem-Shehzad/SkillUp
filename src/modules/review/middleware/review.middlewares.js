@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 import { ApiError, constants } from "@skillup/common-utils";
 
-import { Review } from "../models/review.model.js";
+import { Review } from "../models/courseReview.model.js";
 
 
 export const isValidStudent = async (req, res, next) => {

@@ -13,7 +13,7 @@ import {
    admin_deleteReview,
    courseReviewsAnalytics,
    topRatedCourses
-} from "../controllers/review.controller.js";
+} from "../controllers/courseReview.controller.js";
 
 import {
    checkCourseExits,
@@ -28,14 +28,18 @@ import {
    isValidStudent
 } from "../middleware/review.middlewares.js";
 
+import { 
+   addReviewsANDRating, 
+   getReviewsANDRating 
+} from "../controllers/instructorReview.controller.js";
+
 
 const router = express.Router();
 
 
-
+// public
 router.route('/courses/top-rated')
    .get(topRatedCourses);
-
 
 
 //student
@@ -78,6 +82,10 @@ router.route('/:reviewId')
    );
 
 
+// instructor's review-rating
+router.route('/instructor/:id/reviews-rating')
+   .post(ValidateToken, checkRole('student'), addReviewsANDRating)
+   .get(getReviewsANDRating);
 
 
 
@@ -86,9 +94,6 @@ router.route('/:courseId').get(checkCourseExits, getReviews);
 
 router.route('/reviews-analytics/:courseId')
    .get(checkCourseExits, courseReviewsAnalytics);
-
-
-
 
 
 

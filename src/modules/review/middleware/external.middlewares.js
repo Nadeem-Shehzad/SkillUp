@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 import { ApiError, constants } from "@skillup/common-utils";
 
-import { CourseClientService } from "../services/courseClient.service.js";
-import { EnrollmentClientService } from "../services/enrollmentClient.service.js";
-import { StudentClientService } from "../services/studentClient.service.js";
-import { InstructorClientService } from "../services/instructorClient.service.js";
+import { CourseClientService } from "../services/client/courseClient.service.js";
+import { EnrollmentClientService } from "../services/client/enrollmentClient.service.js";
+import { StudentClientService } from "../services/client/studentClient.service.js";
+import { InstructorClientService } from "../services/client/instructorClient.service.js";
 
 
 export const checkStudentExists = async (req, res, next) => {

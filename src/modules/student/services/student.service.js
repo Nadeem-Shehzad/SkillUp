@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import cloudinary from "../../../config/cloudinary.js";
-
 import { ApiError, constants } from "@skillup/common-utils";
 
 import { imageUpload } from "../utils/image.js";
-import User from "../../auth/models/auth.model.js";
 import { Student } from "../models/student.model.js";
-import { Course } from "../../course/models/course.model.js";
+
+import { AuthClientService } from "./client/authClient.service.js";
+import { CourseClientService } from "./client/courseClient.service.js";
 
 
 
@@ -53,7 +53,8 @@ export const updateUserProfile = async (user, req) => {
    }
 
    if (Object.keys(dataToUpdate).length > 0) {
-      await User.findByIdAndUpdate(user._id, dataToUpdate);
+      const userId = user._id;
+      await AuthClientService.updateUserData({ userId, dataToUpdate });
    }
 
    // update user-student module
@@ -74,7 +75,8 @@ export const updateUserProfile = async (user, req) => {
 
 export const findLoginStudent = async ({ id }) => {
 
-   const user = await User.findById(id);
+   const userId = id;
+   const user = await AuthClientService.findUser({ userId });
    if (!user) {
       throw new ApiError(constants.NOT_FOUND, 'Error: Studnet not found in User DB!');
    }
@@ -94,7 +96,7 @@ export const addBookmarkCourseService = async ({ studentId, courseId }) => {
       throw new ApiError(constants.VALIDATION_ERROR, 'Error: Invalid CourseId!');
    }
 
-   const course = await Course.findById(courseId);
+   const course = await CourseClientService.findCourse({ courseId });
    if (!course) {
       throw new ApiError(constants.NOT_FOUND, 'Error: Course not Found!');
    }
@@ -130,7 +132,7 @@ export const deleteBookmarkService = async ({ student, bookmarkId }) => {
       throw new ApiError(constants.VALIDATION_ERROR, 'Error: Invalid BookmakId!');
    }
 
-   if(!student.bookmarks.includes(bookmarkId.toString())){
+   if (!student.bookmarks.includes(bookmarkId.toString())) {
       throw new ApiError(constants.NOT_FOUND, 'Error: BookMark to be delete not Found!');
    }
 

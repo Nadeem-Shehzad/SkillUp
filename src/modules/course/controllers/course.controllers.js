@@ -23,7 +23,7 @@ import {
    searchCategoryService
 } from "../services/course.service.js";
 
-import { AuthClientService } from "../services/authClient.service.js";
+import { AuthClientService } from "../services/client/authClient.service.js";
 
 
 
@@ -140,6 +140,11 @@ export const getSingleInstructorCourses = async (req, res, next) => {
    } catch (error) {
       next(error);
    }
+}
+
+
+export const getInstructorProfile = async (req, res, next) => {
+   
 }
 
 

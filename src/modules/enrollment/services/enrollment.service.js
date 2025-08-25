@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
-
 import { ApiError, constants } from "@skillup/common-utils";
 
-import { Course } from "../../course/models/course.model.js";
-import { Student } from "../../student/index.js";
 import { Enrollment } from "../models/enrollment.model.js";
 
 import {
@@ -12,6 +9,9 @@ import {
    topCoursesByEnrollment,
    topInstructorsByEnrollment
 } from "../pipelines/pipelines.enrollment.js";
+
+import { CourseClientService } from "./client/courseClient.service.js";
+import { StudentClientService } from "./client/studentClient.service.js";
 
 
 
@@ -36,12 +36,12 @@ export const courseEnrollmentService = async ({ userId, courseId }) => {
       throw new ApiError(constants.VALIDATION_ERROR, 'Invalid Course or Student ID!');
    }
 
-   const student = await Student.findOne({ user: userId });
+   const student = await StudentClientService.findOneStudent(userId);
    if (!student) {
       throw new ApiError(constants.NOT_FOUND, 'Student not Found!');
    }
 
-   const course = await Course.findById(courseId);
+   const course = await CourseClientService.findCourse({ courseId });
    if (!course) {
       throw new ApiError(constants.NOT_FOUND, 'Course to enroll not Found!');
    }
@@ -102,13 +102,7 @@ export const getEnrolledStudentsService = async ({ courseId, instructorId }) => 
       throw new ApiError(constants.VALIDATION_ERROR, 'Invalid course or Instructor ID!');
    }
 
-   const course = await Course.findById(courseId).populate({
-      path: 'instructor',
-      populate: {
-         path: 'user',
-         select: '_id'
-      }
-   });
+   const course = await CourseClientService.findCourseInstructor({ courseId });
 
    if (!course) {
       throw new ApiError(constants.NOT_FOUND, 'Course not Found!');

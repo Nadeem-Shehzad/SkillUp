@@ -1,10 +1,10 @@
 import cloudinary from "../../../config/cloudinary.js";
-
 import { ApiError, constants } from "@skillup/common-utils";
 
 import { imageUpload } from "../utils/image.js";
-import User from "../../auth/models/auth.model.js";
 import { Instructor } from "../models/instructor.model.js";
+
+import { AuthClientService } from "./client/authClient.service.js";
 
 
 
@@ -22,7 +22,9 @@ export const getProfile = async (req) => {
 
 
 export const findLoginInstructor = async ({ id }) => {
-   const instructor = await User.findById(id);
+   const userId = id;
+
+   const instructor = await AuthClientService.findUser({ userId });
    if (!instructor) {
       throw new ApiError(constants.NOT_FOUND, 'Instructor not found!');
    }
@@ -54,7 +56,8 @@ export const updateProfile = async (user, req) => {
    }
 
    if (Object.keys(dataToUpdate).length > 0) {
-      await User.findByIdAndUpdate(user._id, dataToUpdate);
+      const userId = user._id;
+      await AuthClientService.updateUserData({ userId, dataToUpdate });
    }
 
    const instructor = await Instructor.findOne({ user: user._id });

@@ -1,4 +1,4 @@
-import { EnrollmentPublicService } from "../../enrollment/index.js";
+import { EnrollmentPublicService } from "../../../enrollment/index.js";
 
 
 export const EnrollmentClientService = {

@@ -4,9 +4,10 @@ import { Course } from "../models/course.model.js";
 import { addImageUpdateJob, addImageUploadJob } from "../bullmq/jobs/image.job.js";
 import { CourseContent } from "../models/courseContent.model.js";
 import { addVideoUpdateJob, addVideoUploadJob } from "../bullmq/jobs/video.job.js";
-import { Instructor } from "../../instructor/models/instructor.model.js";
 import { deleteVideo } from "../utils/video.js";
 import { redis, REDIS_DATA_EXPIRY_TIME, runInTransaction, NODE_ENV } from "../../../config/index.js";
+
+import { InstructorClientService } from "./client/instructorClient.service.js";
 
 
 
@@ -45,7 +46,7 @@ export const createCourse = async (req) => {
       instructor,
       isPublished
    } = req.body;
-   
+
    // if (req.files && req.files.image) {
    //    thumbnailData = await imageUpload(req);
    // }
@@ -224,9 +225,7 @@ export const allInstructors = async ({ page, limit }) => {
       return JSON.parse(cachedData);
    }
 
-   const instructors = await Instructor.find({})
-      .populate('user', 'name email isVerified')
-      .skip((page - 1) * limit).limit(limit);
+   const instructors = await InstructorClientService.getAllInstructorsData({ page, limit });
 
    await redis.set(key, JSON.stringify(instructors), 'EX', REDIS_DATA_EXPIRY_TIME);
    return instructors;
@@ -409,7 +408,7 @@ export const get_CourseContents = async ({ courseId, page, limit }) => {
 
 
 export const get_CourseContent = async ({ contentId }) => {
-   
+
    const content = await CourseContent.findById(contentId);
    if (!content) {
       throw new ApiError(constants.NOT_FOUND, 'Content Data not Found!');

@@ -1,6 +1,6 @@
 
-import { Course } from "../models/course.model.js";
-import { InstructorClientService } from "./instructorClient.service.js";
+import { Course } from "../../models/course.model.js";
+import { InstructorClientService } from "../client/instructorClient.service.js";
 
 
 export const CoursePublicService = {
@@ -8,6 +8,20 @@ export const CoursePublicService = {
    async courseExists(courseId) {
       const course = await Course.findById(courseId);
       return !!course;
+   },
+
+   findCourse({ courseId }) {
+      return Course.findById(courseId);
+   },
+
+   findCourseInstructor({ courseId }) {
+      return Course.findById(courseId).populate({
+         path: 'instructor',
+         populate: {
+            path: 'user',
+            select: '_id'
+         }
+      });
    },
 
    async updateCourseRating(courseId, avgRating, totalReviews) {

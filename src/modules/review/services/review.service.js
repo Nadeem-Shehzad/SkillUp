@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 
 import { ApiError, constants } from "@skillup/common-utils";
 
-import { Review } from "../models/review.model.js";
+import { Review } from "../models/courseReview.model.js";
 import { 
    totalStats, 
    ratingDistribution, 
    latestReviews 
 } from "../pipelines/review.pipelines.js";
 
-import { AuthClientService } from "./authClient.service.js";
-import { CourseClientService } from "./courseClient.service.js";
+import { AuthClientService } from "./client/authClient.service.js";
+import { CourseClientService } from "./client/courseClient.service.js";
 
 
 
