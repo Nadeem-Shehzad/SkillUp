@@ -19,6 +19,8 @@ import { addEmailJob } from '../jobs/addEmailJob.js';
 
 import { StudentClientService } from "./client/studentClient.service.js";
 import { InstructorClientService } from "./client/instructorClient.service.js";
+import { AdminClientService } from './client/adminClient.service.js';
+
 
 
 
@@ -28,7 +30,7 @@ export const createUser = async (req) => {
 
    const { name, email, password, role } = req.body;
 
-   const allowedRoles = ['student', 'instructor'];
+   const allowedRoles = ['student', 'instructor', 'admin'];
    if (!allowedRoles.includes(role)) {
       throw new ApiError(constants.FORBIDDEN, 'Invalid role to register!')
    }
@@ -53,13 +55,11 @@ export const createUser = async (req) => {
 
    if (user.role === 'student') {
       await StudentClientService.createStudent(user._id);
-   }
-
-   if (user.role === 'instructor') {
+   } else if (user.role === 'instructor') {
       await InstructorClientService.createInstructor(user._id);
+   } else if (user.role === 'admin') {
+      await AdminClientService.createAdminAccount(user._id);
    }
-
-   logger.info("User created successfully", { userId: user._id });
 
    return user;
 }

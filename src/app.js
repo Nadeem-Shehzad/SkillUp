@@ -8,14 +8,15 @@ import { authRoutes } from './modules/auth/index.js';
 import { instructorRoutes } from './modules/instructor/index.js';
 import { studentRoutes } from './modules/student/index.js';
 import { courseRoutes } from './modules/course/index.js';
+import { enrollmentRoutes } from './modules/enrollment/index.js';
+import { ReviewRoutes } from './modules/review/index.js';
+import { adminRoute } from './modules/admin/index.js';
 
 import { customErrorHandler } from './middlewares/errorHandler.js';
 
 // load workers
 import './bullmq/workerLoader.js';
 
-import { enrollmentRoutes } from './modules/enrollment/index.js';
-import { ReviewRoutes } from './modules/review/index.js';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(fileUpload({
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/v1/admin', adminRoute);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/instructors', instructorRoutes);
 app.use('/api/v1/students', studentRoutes);
@@ -42,7 +44,6 @@ app.use('/api/v1/reviews', ReviewRoutes);
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
-
 
 app.use(customErrorHandler);
 

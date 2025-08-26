@@ -26,7 +26,10 @@ const {
     MAIL_USER,
     MAIL_PASSWORD,
     MAIL_HOST,
-    MAIL_PORT
+    MAIL_PORT,
+    SUPER_ADMIN_NAME,
+    SUPER_ADMIN_EMAIL,
+    SUPER_ADMIN_PASSWORD
 } = process.env;
 
 if (!NODE_ENV) throw new Error('NODE_ENV is required in .env');
@@ -43,6 +46,9 @@ if (!MAIL_USER) throw new Error('MAIL_USER is required in .env');
 if (!MAIL_PASSWORD) throw new Error('MAIL_PASSWORD is required in .env');
 if (!MAIL_HOST) throw new Error('MAIL_HOST is required in .env');
 if (!MAIL_PORT) throw new Error('MAIL_PORT is required in .env');
+if (!SUPER_ADMIN_NAME) throw new Error('SUPER_ADMIN_NAME is required in .env');
+if (!SUPER_ADMIN_EMAIL) throw new Error('SUPER_ADMIN_EMAIL is required in .env');
+if (!SUPER_ADMIN_PASSWORD) throw new Error('SUPER_ADMIN_PASSWORD is required in .env');
 
 export {
     NODE_ENV,
@@ -58,5 +64,8 @@ export {
     MAIL_USER,
     MAIL_PASSWORD,
     MAIL_HOST,
-    MAIL_PORT
+    MAIL_PORT,
+    SUPER_ADMIN_NAME,
+    SUPER_ADMIN_EMAIL,
+    SUPER_ADMIN_PASSWORD
 }

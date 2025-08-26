@@ -4,6 +4,15 @@ import { ApiError, constants } from "@skillup/common-utils";
 
 export const AuthPublicService = {
 
+   createUser({ name, email, password, role }) {
+      return User.create({
+         name,
+         email,
+         password,
+         role
+      });
+   },
+
    findUser({ userId }) {
       return User.findById(userId);
    },
@@ -28,5 +37,7 @@ export const AuthPublicService = {
 
    updateUser({ userId, dataToUpdate }) {
       return User.findByIdAndUpdate(userId, dataToUpdate);
-   }
+   },
+
+
 }
