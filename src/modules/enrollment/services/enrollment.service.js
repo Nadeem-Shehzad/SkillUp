@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ApiError, constants } from "@skillup/common-utils";
+import { ApiError, constants, logger } from "@skillup/common-utils";
 
 import { Enrollment } from "../models/enrollment.model.js";
 
@@ -140,7 +140,7 @@ export const getEnrolledStudentsService = async ({ courseId, instructorId }) => 
 }
 
 
-export const admin_studentEnrollmentsService = async ({ studentId }) => {
+export const studentEnrollmentsService = async ({ studentId }) => {
 
    if (!mongoose.Types.ObjectId.isValid(studentId)) {
       throw new ApiError(constants.VALIDATION_ERROR, 'Invalid Student ID!');
@@ -157,7 +157,7 @@ export const admin_studentEnrollmentsService = async ({ studentId }) => {
 }
 
 
-export const admin_courseEnrollmentsService = async ({ courseId }) => {
+export const courseEnrollmentsService = async ({ courseId }) => {
 
    if (!mongoose.Types.ObjectId.isValid(courseId)) {
       throw new ApiError(constants.VALIDATION_ERROR, 'Invalid courseId!');
@@ -179,7 +179,7 @@ export const admin_courseEnrollmentsService = async ({ courseId }) => {
 }
 
 
-export const admin_updateEnrollmentService = async ({ enrollmentId, dataToUpdate }) => {
+export const updateEnrollmentService = async ({ enrollmentId, dataToUpdate }) => {
 
    if (!mongoose.Types.ObjectId.isValid(enrollmentId)) {
       throw new ApiError(constants.VALIDATION_ERROR, 'Invalid enrollmentId!');
@@ -195,7 +195,7 @@ export const admin_updateEnrollmentService = async ({ enrollmentId, dataToUpdate
 }
 
 
-export const admin_deleteEnrollmentService = async ({ enrollmentId }) => {
+export const deleteEnrollmentService = async ({ enrollmentId }) => {
 
    if (!mongoose.Types.ObjectId.isValid(enrollmentId)) {
       throw new ApiError(constants.VALIDATION_ERROR, 'Invalid enrollmentId!');

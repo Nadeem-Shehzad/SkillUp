@@ -252,7 +252,7 @@ export const singleInstructorCourses = async ({ instructorId, page, limit }) => 
 }
 
 
-export const publish_Course = async ({ instructorId, courseId }) => {
+export const publish_CourseByInstructor = async ({ instructorId, courseId }) => {
 
    const course = await Course.findById(courseId);
 
@@ -261,7 +261,11 @@ export const publish_Course = async ({ instructorId, courseId }) => {
    }
 
    if (course.instructor.toString() !== instructorId.toString()) {
-      throw new ApiError(constants.FORBIDDEN, 'Access Denied.');
+      throw new ApiError(constants.FORBIDDEN, `Access Denied. Can't modify other's courses!`);
+   }
+
+   if (course.blockedByAdmin === true) {
+      throw new ApiError(constants.FORBIDDEN, `Can't publish as it is blocked by admin!`);
    }
 
    course.isPublished = true;
@@ -271,7 +275,7 @@ export const publish_Course = async ({ instructorId, courseId }) => {
 }
 
 
-export const unpublish_Course = async ({ instructorId, courseId }) => {
+export const unpublish_CourseByInstructor = async ({ instructorId, courseId }) => {
    const course = await Course.findById(courseId);
 
    if (!course) {
@@ -485,4 +489,40 @@ export const deleteCourseContents = async ({ instructorId, contentId }) => {
 
       return true;
    });
+}
+
+
+
+
+// admin 
+export const publish_CourseByAdmin = async ({ courseId }) => {
+
+   const course = await Course.findById(courseId);
+
+   if (!course) {
+      throw new ApiError(constants.NOT_FOUND, 'Course not Found!');
+   }
+
+   course.isPublished = true;
+   course.blockedByAdmin = false;
+   course.blockReason = '';
+   await course.save();
+
+   return course;
+}
+
+
+export const unpublish_CourseByAdmin = async ({ courseId, reason }) => {
+   const course = await Course.findById(courseId);
+
+   if (!course) {
+      throw new ApiError(constants.NOT_FOUND, 'Course not Found!');
+   }
+
+   course.isPublished = false;
+   course.blockedByAdmin = true;
+   course.blockReason = reason;
+   await course.save();
+
+   return course;
 }

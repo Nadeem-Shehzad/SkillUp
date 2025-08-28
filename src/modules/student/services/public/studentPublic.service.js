@@ -15,5 +15,21 @@ export const StudentPublicService = {
 
    enrolledWithInstructor(studentId, instructorId) {
       return EnrollmentClientService.enrolledWithInstructor(studentId, instructorId);
-   }
+   },
+
+   allStudents({ page, limit }) {
+      return Student.find({})
+         .populate('user', 'name email isVerified')
+         .skip((page - 1) * limit).limit(limit);
+   },
+
+   findStudent({ studentId }) {
+      return Student.findById(studentId).populate('user', 'name email isVerified');
+   },
+
+   updateStudentStatus({ studentId, isblocked }) {
+      return Student.findByIdAndUpdate(studentId, {
+         isblocked
+      }, { new: true });
+   },
 }

@@ -49,6 +49,10 @@ const studentSchema = new mongoose.Schema({
       type: String,
       maxlength: 500,
       default: '',
+   },
+   isblocked: {
+      type: Boolean,
+      default: false
    }
 }, { timestamps: true });
 

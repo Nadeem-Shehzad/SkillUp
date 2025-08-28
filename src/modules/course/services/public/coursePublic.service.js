@@ -1,6 +1,11 @@
 
 import { Course } from "../../models/course.model.js";
 import { InstructorClientService } from "../client/instructorClient.service.js";
+import {
+   allCourses,
+   publish_CourseByAdmin,
+   unpublish_CourseByAdmin
+} from "../course.service.js";
 
 
 export const CoursePublicService = {
@@ -47,6 +52,17 @@ export const CoursePublicService = {
 
    async getInstructorCourseIdsAndNames(instrcutorId) {
       return await Course.find({ instructor: instrcutorId }).select('_id title');
-   }
+   },
 
+   allCourse({ page, limit }) {
+      return allCourses({ page, limit });
+   },
+
+   approveCourse({ courseId }) {
+      return publish_CourseByAdmin({ courseId });
+   },
+
+   rejectCourse({ courseId, reason }) {
+      return unpublish_CourseByAdmin({ courseId, reason });
+   }
 };

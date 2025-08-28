@@ -67,6 +67,13 @@ const courseSchema = new mongoose.Schema(
          type: Boolean,
          default: false,
       },
+      blockedByAdmin: {
+         type: Boolean,
+         default: false
+      },
+      blockReason: {
+         type: String
+      }
    },
    { timestamps: true }
 );

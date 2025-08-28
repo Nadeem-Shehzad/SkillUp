@@ -1,6 +1,10 @@
 import { ApiError, constants } from "@skillup/common-utils";
 import { Admin } from "../model/admin.model.js";
 import { AuthClientService } from "./client/authClient.service.js";
+import { CourseClientService } from "./client/courseClient.service.js";
+import { InstructorClientService } from "./client/instructorClient.service.js";
+import { StudentClientService } from "./client/studentClient.service.js";
+import { EnrollmentClientService } from "./client/enrollmentClient.service.js";
 
 
 
@@ -73,4 +77,85 @@ export const verifyAdminService = async ({ adminId }) => {
    await AuthClientService.updateUserStatus({ userId, dataToUpdate });
 
    return updatedAdmin;
+}
+
+
+// courses
+export const getAllCourses = async ({ page, limit }) => {
+   return CourseClientService.getAllCourses({ page, limit })
+}
+
+
+export const getCourse = async ({ courseId }) => {
+   return CourseClientService.getCourse({ courseId });
+}
+
+
+export const publish_Course = async ({ courseId }) => {
+   return CourseClientService.approveCourse({ courseId });
+}
+
+
+export const unpublish_Course = async ({ courseId, reason }) => {
+   return CourseClientService.rejectCourse({ courseId, reason });
+}
+
+
+export const courseEnrollmentService = async ({ courseId }) => {
+   return EnrollmentClientService.getCourseEnrollments({ courseId });
+}
+
+
+// instructors
+export const getAllInstructorsDataService = async ({ page, limit }) => {
+   return InstructorClientService.getAllInstructorsData({ page, limit });
+}
+
+
+export const getSingleInstructorDataService = async ({ instructorId }) => {
+   return InstructorClientService.getInstructorData({ instructorId });
+}
+
+
+export const updateInstructorStatusService = async ({ instructorId, status }) => {
+   return InstructorClientService.updateInstructorStatus({ instructorId, status });
+}
+
+
+
+//students
+export const getAllStudentsDataService = async ({ page, limit }) => {
+   return StudentClientService.getStudents({ page, limit });
+}
+
+
+export const getSingleStudentDataService = async ({ studentId }) => {
+   return StudentClientService.findOneStudent({ studentId });
+}
+
+
+export const updateStudentStatusService = async ({ studentId, isblocked }) => {
+   return StudentClientService.updateStudentStatus({ studentId, isblocked });
+}
+
+
+export const studentEnrollmentService = async ({ studentId }) => {
+   return EnrollmentClientService.getStudentEnrollments({ studentId });
+}
+
+
+
+//enrollments
+export const updateEnrollmentService = async ({ enrollmentId, dataToUpdate }) => {
+   return EnrollmentClientService.updateEnrollment({ enrollmentId, dataToUpdate });
+}
+
+
+export const deleteEnrollmentService = async ({ enrollmentId }) => {
+   return EnrollmentClientService.deleteEnrollment({ enrollmentId });
+}
+
+
+export const enrollmentAllStatsService = async () => {
+   return EnrollmentClientService.enrollmentAllStats();
 }

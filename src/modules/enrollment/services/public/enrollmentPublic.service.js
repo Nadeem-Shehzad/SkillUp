@@ -1,5 +1,13 @@
 import { Enrollment } from "../../models/enrollment.model.js";
 import { CourseClientService } from "../client/courseClient.service.js";
+import {
+   admin_allStatsService,
+   courseEnrollmentsService,
+   deleteEnrollmentService,
+   studentEnrollmentsService,
+   updateEnrollmentService
+} from "../enrollment.service.js";
+
 
 
 export const EnrollmentPublicService = {
@@ -47,4 +55,27 @@ export const EnrollmentPublicService = {
       return result;
    },
 
+   studentEnrollments({ studentId }) {
+      return studentEnrollmentsService({ studentId });
+   },
+
+   courseEnrollments({ courseId }) {
+      return courseEnrollmentsService({ courseId });
+   },
+
+   findEnrollment({ enrollmentId }) {
+      return Enrollment.findById(enrollmentId);
+   },
+
+   updateEnrollment({ enrollmentId, dataToUpdate }) {
+      return updateEnrollmentService({ enrollmentId, dataToUpdate });
+   },
+
+   deleteEnrollment({ enrollmentId }) {
+      return deleteEnrollmentService({ enrollmentId });
+   },
+
+   enrollmentAllStats(){
+      return admin_allStatsService();
+   }
 };

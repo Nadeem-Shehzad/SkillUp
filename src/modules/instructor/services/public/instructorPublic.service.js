@@ -1,3 +1,4 @@
+import { logger } from "@skillup/common-utils";
 import { Instructor } from "../../models/instructor.model.js";
 import { AuthClientService } from "../client/authClient.service.js";
 
@@ -50,6 +51,12 @@ export const InstructorPublicService = {
    updateInstructorStudentCounting(instrcutorId, totalStudents) {
       return Instructor.findByIdAndUpdate(instrcutorId, {
          totalStudents
-      });
+      }, { new: true });
+   },
+
+   updateInstructorStatus({ instructorId, status }) {
+      return Instructor.findByIdAndUpdate(instructorId, {
+         status
+      }, { new: true });
    },
 }

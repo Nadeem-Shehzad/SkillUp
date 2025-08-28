@@ -7,8 +7,6 @@ import {
    addCourseContents,
    singleInstructorCourses,
    allInstructors,
-   unpublish_Course,
-   publish_Course,
    delete_Course,
    update_Course,
    deleteCourseContents,
@@ -19,7 +17,9 @@ import {
    searchContentsService,
    searchByInstructorService,
    searchTagsService,
-   searchCategoryService
+   searchCategoryService,
+   publish_CourseByInstructor,
+   unpublish_CourseByInstructor
 } from "../services/course.service.js";
 
 import { AuthClientService } from "../services/client/authClient.service.js";
@@ -250,7 +250,7 @@ export const publishCourse = async (req, res, next) => {
 
       const courseId = req.params.courseId;
       const instructorId = instructor._id;
-      const course = await publish_Course({ instructorId, courseId });
+      const course = await publish_CourseByInstructor({ instructorId, courseId });
 
       return res.status(200).json({ success: true, message: `Course Published.`, data: course });
    } catch (error) {
@@ -267,7 +267,7 @@ export const unpublishCourse = async (req, res, next) => {
 
       const courseId = req.params.courseId;
       const instructorId = instructor._id;
-      const course = await unpublish_Course({ instructorId, courseId });
+      const course = await unpublish_CourseByInstructor({ instructorId, courseId });
 
       return res.status(200).json({ success: true, message: `Course unPublished.`, data: course });
    } catch (error) {

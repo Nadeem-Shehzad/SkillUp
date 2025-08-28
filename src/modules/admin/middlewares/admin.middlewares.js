@@ -38,6 +38,14 @@ export const verifyAdmin = () => {
          throw new ApiError(constants.NOT_FOUND, 'Admin not Found!');
       }
 
+      if(admin.isApproved === false){
+         throw new ApiError(constants.FORBIDDEN, 'Sorry, access denied. as you are not verified by super-admin!');
+      }
+
+      if(admin.isBlocked === true){
+         throw new ApiError(constants.FORBIDDEN, 'Sorry, access denied. as you are blocked by super-admin!');
+      }
+
       req.adminId = admin._id;
       next();
    }
