@@ -2,7 +2,7 @@ import { Order } from "../model/order.model.js";
 import { ApiError, constants, logger } from "@skillup/common-utils";
 import { CourseClientService } from "./client/courseClient.service.js";
 import { StudentClientService } from "./client/studentClient.service.js";
-
+import { PaymentClientService } from "./client/paymentClient.service.js";
 
 
 export const createOrderService = async (studentId, courseId, currency, metadata = {}) => {
@@ -22,7 +22,17 @@ export const createOrderService = async (studentId, courseId, currency, metadata
       metadata,
       status: "pending",
    });
-   return order;
+
+   const paymentIntent = await PaymentClientService.getPaymentIntentData({
+      amount: course.price,
+      currency,
+      orderId: order._id.toString()
+   });
+
+   return {
+      order,
+      clientSecret: paymentIntent.client_secret
+   };
 };
 
 
@@ -77,22 +87,4 @@ export const cancelOrderService = async (orderId, studentId) => {
    order.status = "cancelled";
    await order.save();
    return order;
-};
-
-
-
-// 🔹 Admin updates order status
-export const updateOrderStatusService = async (orderId, status) => {
-   const order = await Order.findById(orderId);
-
-   if (!order) throw new Error("Order not found");
-
-   order.status = status;
-   await order.save();
-   return order;
-};
-
-// 🔹 Admin: Get all orders (with optional filters later)
-export const getAllOrdersForAdminService = async () => {
-   return await Order.find().sort({ createdAt: -1 });
 };

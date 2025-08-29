@@ -29,8 +29,11 @@ const {
     MAIL_PORT,
     SUPER_ADMIN_NAME,
     SUPER_ADMIN_EMAIL,
-    SUPER_ADMIN_PASSWORD
+    SUPER_ADMIN_PASSWORD,
+    STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET
 } = process.env;
+
 
 if (!NODE_ENV) throw new Error('NODE_ENV is required in .env');
 if (!PORT) throw new Error('PORT is required in .env');
@@ -49,6 +52,9 @@ if (!MAIL_PORT) throw new Error('MAIL_PORT is required in .env');
 if (!SUPER_ADMIN_NAME) throw new Error('SUPER_ADMIN_NAME is required in .env');
 if (!SUPER_ADMIN_EMAIL) throw new Error('SUPER_ADMIN_EMAIL is required in .env');
 if (!SUPER_ADMIN_PASSWORD) throw new Error('SUPER_ADMIN_PASSWORD is required in .env');
+if (!STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY is required in .env');
+if (!STRIPE_WEBHOOK_SECRET) throw new Error('STRIPE_WEBHOOK_SECRET is required in .env');
+
 
 export {
     NODE_ENV,
@@ -67,5 +73,7 @@ export {
     MAIL_PORT,
     SUPER_ADMIN_NAME,
     SUPER_ADMIN_EMAIL,
-    SUPER_ADMIN_PASSWORD
+    SUPER_ADMIN_PASSWORD,
+    STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET
 }

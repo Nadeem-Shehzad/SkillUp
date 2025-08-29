@@ -9,9 +9,7 @@ import {
    createOrder,
    getMyOrders,
    getOrderById,
-   cancelOrder,
-   updateOrderStatus,
-   getAllOrdersForAdmin,
+   cancelOrder
 } from "../controllers/order.controller.js";
 
 const router = express.Router();
@@ -49,12 +47,5 @@ router.route("/:orderId/cancel").patch(
    cancelOrder
 );
 
-// 🔹 Admin updates order status (e.g. refund, mark failed, etc.)
-router.route("/:orderId/status")
-   .patch(ValidateToken, updateOrderStatus);
-
-// 🔹 Admin can view all orders (with filters like status, date, etc.)
-router.route("/admin/all")
-   .get(ValidateToken, getAllOrdersForAdmin);
 
 export default router;
