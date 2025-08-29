@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { logger } from "@skillup/common-utils";
 
-import { MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASSWORD } from '../config/env.js';
+import { MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASSWORD } from '../../config/env.js';
 
 
 const transporter = nodemailer.createTransport({

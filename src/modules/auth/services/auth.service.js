@@ -4,14 +4,13 @@ import {
    ApiError,
    constants,
    tokenUtils,
-   logger
 } from "@skillup/common-utils";
 
 
 import { comparePassword, hashPassword } from "../utils/password.js";
 import User from "../models/auth.model.js";
 import { imageUpload } from "../utils/image.js";
-import { sendEmail } from "../../../notifications/email.js";
+import { sendEmail } from "../../notifications/email.js";
 import { redis } from "../../../config/index.js";
 import randomstring from 'randomstring';
 import { JWT_SECRET, TOKEN_EXPIRES_IN } from "../../../config/env.js";
