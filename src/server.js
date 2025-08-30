@@ -1,4 +1,4 @@
-import app from './app.js';
+import server from './app.js';
 import { logger } from "@skillup/common-utils";
 import { ConnectMongoDB } from './config/index.js';
 import { PORT } from './config/env.js';
@@ -10,6 +10,6 @@ await ConnectMongoDB();
 
 await bootstrapSuperAdmin();
 
-app.listen(RPORT, () => {
+server.listen(RPORT, () => {
    logger.info(`✅ Server Running on PORT ::: ${RPORT}`);
 });

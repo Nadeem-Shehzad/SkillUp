@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 import helmet from 'helmet';
+import { Server as SocketIOserver } from 'socket.io';
+import { createServer } from 'http';
 
 import { authRoutes } from './modules/auth/index.js';
 import { instructorRoutes } from './modules/instructor/index.js';
@@ -13,6 +15,9 @@ import { adminRoute } from './modules/admin/index.js';
 import { OrderRoutes } from './modules/order/index.js';
 import { paymentRoutes, stripeWebhook } from './modules/payment/index.js';
 
+import { setSocketInstance } from './socket/socketInstance.js';
+import { setupSocket } from './socket/index.js'
+
 import { globalRateLimiter } from './middlewares/rateLimiters.js';
 import { customErrorHandler } from './middlewares/errorHandler.js';
 
@@ -21,6 +26,8 @@ import './bullmq/workerLoader.js';
 
 
 const app = express();
+const server = createServer(app);
+
 
 app.use(helmet());
 app.use(globalRateLimiter);
@@ -40,6 +47,17 @@ app.post(
   stripeWebhook
 );
 
+const io = new SocketIOserver(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  },
+});
+
+setSocketInstance(io);
+setupSocket(io);
+
 app.use(express.json());
 
 app.use('/api/v1/admin', adminRoute);
@@ -49,7 +67,7 @@ app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/enrollments', enrollmentRoutes);
 app.use('/api/v1/reviews', ReviewRoutes);
-app.use('/api/v1/order',OrderRoutes); 
+app.use('/api/v1/order', OrderRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 
 // 404
@@ -59,4 +77,4 @@ app.use((req, res) => {
 
 app.use(customErrorHandler);
 
-export default app;
+export default server;
