@@ -1,4 +1,3 @@
-import { logger } from "@skillup/common-utils";
 import { Instructor } from "../../models/instructor.model.js";
 import { AuthClientService } from "../client/authClient.service.js";
 
@@ -11,7 +10,24 @@ export const InstructorPublicService = {
 
    async getInstructorData(instructorId) {
       const instructor = await Instructor.findById(instructorId)
-         .select('user bio expertise qualifications totalCourses totalStudents averageRating status');
+         .select('_id user bio expertise qualifications totalCourses totalStudents averageRating status');
+
+      const user = await AuthClientService.getUserInfo(instructor.user);
+
+      const userObj = user.toObject();
+      const instructorObj = instructor.toObject();
+
+      const instructorData = {
+         ...userObj,
+         ...instructorObj
+      }
+
+      return instructorData;
+   },
+
+   async getInstructorUserData(instructorId) {
+      const instructor = await Instructor.findOne({ user: instructorId })
+         .select('_id user bio expertise qualifications totalCourses totalStudents averageRating status');
 
       const user = await AuthClientService.getUserInfo(instructor.user);
 
@@ -28,6 +44,10 @@ export const InstructorPublicService = {
 
    checkInstructorExists(instructorId) {
       return Instructor.findById(instructorId);
+   },
+
+   findInstructor(userId) {
+      return Instructor.findOne({ user: userId });
    },
 
    getAllInstructors({ page, limit }) {

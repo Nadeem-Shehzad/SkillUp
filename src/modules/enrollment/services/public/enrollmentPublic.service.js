@@ -12,8 +12,8 @@ import {
 
 export const EnrollmentPublicService = {
 
-   checkEnrollment(studentId, courseId) {
-      const enrollment = Enrollment.findOne({
+   async checkEnrollment(studentId, courseId) {
+      const enrollment = await Enrollment.findOne({
          studentId,
          courseId
       });
@@ -75,7 +75,11 @@ export const EnrollmentPublicService = {
       return deleteEnrollmentService({ enrollmentId });
    },
 
-   enrollmentAllStats(){
+   enrollmentAllStats() {
       return admin_allStatsService();
+   },
+
+   findAllEnrollmentsOfStudent({ studentId }) {
+      return Enrollment.find({ studentId }).select('courseId');
    }
 };

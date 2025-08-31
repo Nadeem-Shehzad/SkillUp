@@ -1,5 +1,7 @@
 
+import { logger } from "@skillup/common-utils";
 import { Student } from "../../models/student.model.js";
+import { AuthClientService } from "../client/authClient.service.js";
 import { EnrollmentClientService } from "../client/enrollmentClient.service.js";
 
 
@@ -9,8 +11,23 @@ export const StudentPublicService = {
       return Student.create({ user: userId });
    },
 
-   studentExists(studentId) {
-      return Student.findOne({ user: studentId });
+   studentExists(userId) {
+      return Student.findOne({ user: userId });
+   },
+
+   async getStudentUserData(userId) {
+      const student = await Student.findOne({ user: userId }).select('_id');
+      const user = await AuthClientService.getUserInfo(userId);
+
+      const studentObj = student.toObject();
+      const userObj = user.toObject();
+
+      const studentData = {
+         ...userObj,
+         ...studentObj
+      }
+
+      return studentData;
    },
 
    enrolledWithInstructor(studentId, instructorId) {

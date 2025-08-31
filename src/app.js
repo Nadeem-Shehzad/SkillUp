@@ -14,9 +14,11 @@ import { ReviewRoutes } from './modules/review/index.js';
 import { adminRoute } from './modules/admin/index.js';
 import { OrderRoutes } from './modules/order/index.js';
 import { paymentRoutes, stripeWebhook } from './modules/payment/index.js';
+import { groupChatRouter } from './modules/chat/index.js';
+
 
 import { setSocketInstance } from './socket/socketInstance.js';
-import { setupSocket } from './socket/index.js'
+import { setupSocket } from './socket/setup.js';
 
 import { globalRateLimiter } from './middlewares/rateLimiters.js';
 import { customErrorHandler } from './middlewares/errorHandler.js';
@@ -69,6 +71,7 @@ app.use('/api/v1/enrollments', enrollmentRoutes);
 app.use('/api/v1/reviews', ReviewRoutes);
 app.use('/api/v1/order', OrderRoutes);
 app.use('/api/v1/payment', paymentRoutes);
+app.use('/api/v1/group-chat', groupChatRouter);
 
 // 404
 app.use((req, res) => {
