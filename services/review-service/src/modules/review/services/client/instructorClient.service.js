@@ -1,4 +1,4 @@
-import { InstructorPublicService } from "../../../instructor/index.js";
+import { InstructorPublicService } from "../../../../../../../src/modules/instructor/index.js";
 
 
 export const InstructorClientService = {

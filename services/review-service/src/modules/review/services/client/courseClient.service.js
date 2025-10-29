@@ -1,5 +1,5 @@
 
-import { CoursePublicService } from "../../../course/index.js";
+import { CoursePublicService } from "../../../../../../../src/modules/course/index.js";
 
 
 export const CourseClientService = {

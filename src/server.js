@@ -5,7 +5,7 @@ import { PORT } from './config/env.js';
 import { bootstrapSuperAdmin } from './modules/admin/bootstrap.js';
 
 
-const RPORT = PORT || 4000;
+const RPORT = 5000;
 await ConnectMongoDB();
 
 await bootstrapSuperAdmin();

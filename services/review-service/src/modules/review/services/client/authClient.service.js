@@ -1,4 +1,4 @@
-import { AuthPublicService } from "../../../auth/index.js";
+import { AuthPublicService } from "../../../../../../../src/modules/auth/index.js";
 
 
 export const AuthClientService = {

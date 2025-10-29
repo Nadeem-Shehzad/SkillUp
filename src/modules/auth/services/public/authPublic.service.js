@@ -1,5 +1,5 @@
 import User from "../../models/auth.model.js";
-import { ApiError, constants } from "@skillup/common-utils";
+import { ApiError, constants,logger } from "@skillup/common-utils";
 
 
 export const AuthPublicService = {
@@ -17,8 +17,9 @@ export const AuthPublicService = {
       return User.findById(userId);
    },
 
-   getUserInfo(userId) {
-      return User.findById(userId).select('name email isVerified');
+   async getUserInfo(userId) {
+      const user = await User.findById(userId).select('name email isVerified');
+      return user;
    },
 
    async verifyUser({ userId, userRole }) {
@@ -38,6 +39,4 @@ export const AuthPublicService = {
    updateUser({ userId, dataToUpdate }) {
       return User.findByIdAndUpdate(userId, dataToUpdate);
    },
-
-
 }

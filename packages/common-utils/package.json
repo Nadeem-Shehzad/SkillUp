@@ -3,5 +3,8 @@
   "name": "@skillup/common-utils",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^1.13.1"
+  }
 }

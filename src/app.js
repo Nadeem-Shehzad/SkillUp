@@ -5,12 +5,15 @@ import helmet from 'helmet';
 import { Server as SocketIOserver } from 'socket.io';
 import { createServer } from 'http';
 
-import { authRoutes } from './modules/auth/index.js';
+import { authPublicRoutes, authRoutes } from './modules/auth/index.js';
 import { instructorRoutes } from './modules/instructor/index.js';
-import { studentRoutes } from './modules/student/index.js';
-import { courseRoutes } from './modules/course/index.js';
+import { studentRoutes, studentPublicRoutes } from './modules/student/index.js';
+
+import { courseRoutes, coursePublicRoutes } from './modules/course/index.js';
+
+
 import { enrollmentRoutes } from './modules/enrollment/index.js';
-import { ReviewRoutes } from './modules/review/index.js';
+// import { ReviewRoutes } from './modules/review/index.js';
 import { adminRoute } from './modules/admin/index.js';
 import { OrderRoutes } from './modules/order/index.js';
 import { paymentRoutes, stripeWebhook } from './modules/payment/index.js';
@@ -63,12 +66,20 @@ setupSocket(io);
 app.use(express.json());
 
 app.use('/api/v1/admin', adminRoute);
+
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/public/auth', authPublicRoutes);
+
 app.use('/api/v1/instructors', instructorRoutes);
+
 app.use('/api/v1/students', studentRoutes);
+app.use('/api/v1/public/students', studentPublicRoutes);
+
 app.use('/api/v1/courses', courseRoutes);
+app.use('/api/v1/public/courses', coursePublicRoutes);
+
 app.use('/api/v1/enrollments', enrollmentRoutes);
-app.use('/api/v1/reviews', ReviewRoutes);
+//app.use('/api/v1/reviews', ReviewRoutes);
 app.use('/api/v1/order', OrderRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/group-chat', groupChatRouter);

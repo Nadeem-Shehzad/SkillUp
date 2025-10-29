@@ -1,4 +1,5 @@
 
+import { logger } from "@skillup/common-utils";
 import { Course } from "../../models/course.model.js";
 import { InstructorClientService } from "../client/instructorClient.service.js";
 import {
@@ -33,11 +34,13 @@ export const CoursePublicService = {
       return await Course.findByIdAndUpdate(courseId, {
          averageRating: avgRating,
          totalReviews
-      });
+      }, { new: true });
    },
 
    async getCourseSummary(courseId) {
+      logger.info(` *****  Inside GetCourseSummary *****`);
       const course = await Course.findById(courseId);
+
       const instructor = await InstructorClientService.getInstructorData(course.instructor);
 
       const courseName = course.title;

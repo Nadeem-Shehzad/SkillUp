@@ -11,8 +11,9 @@ export const StudentPublicService = {
       return Student.create({ user: userId });
    },
 
-   studentExists(userId) {
-      return Student.findOne({ user: userId });
+   async studentExists(userId) {
+      logger.info(`---------> inside studentExists Function...`);
+      return await Student.findOne({ user: userId });
    },
 
    async getStudentUserData(userId) {
