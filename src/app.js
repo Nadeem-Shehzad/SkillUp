@@ -6,13 +6,13 @@ import { Server as SocketIOserver } from 'socket.io';
 import { createServer } from 'http';
 
 import { authPublicRoutes, authRoutes } from './modules/auth/index.js';
-import { instructorRoutes } from './modules/instructor/index.js';
+import { instructorPublicRoutes, instructorRoutes } from './modules/instructor/index.js';
 import { studentRoutes, studentPublicRoutes } from './modules/student/index.js';
 
 import { courseRoutes, coursePublicRoutes } from './modules/course/index.js';
 
 
-import { enrollmentRoutes } from './modules/enrollment/index.js';
+import { enrollmentPublicRoutes, enrollmentRoutes } from './modules/enrollment/index.js';
 // import { ReviewRoutes } from './modules/review/index.js';
 import { adminRoute } from './modules/admin/index.js';
 import { OrderRoutes } from './modules/order/index.js';
@@ -71,6 +71,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/public/auth', authPublicRoutes);
 
 app.use('/api/v1/instructors', instructorRoutes);
+app.use('/api/v1/public/instructors', instructorPublicRoutes);
 
 app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/public/students', studentPublicRoutes);
@@ -79,6 +80,8 @@ app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/public/courses', coursePublicRoutes);
 
 app.use('/api/v1/enrollments', enrollmentRoutes);
+app.use('/api/v1/public/enrollments', enrollmentPublicRoutes);
+
 //app.use('/api/v1/reviews', ReviewRoutes);
 app.use('/api/v1/order', OrderRoutes);
 app.use('/api/v1/payment', paymentRoutes);

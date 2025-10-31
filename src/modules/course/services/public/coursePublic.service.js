@@ -38,7 +38,6 @@ export const CoursePublicService = {
    },
 
    async getCourseSummary(courseId) {
-      logger.info(` *****  Inside GetCourseSummary *****`);
       const course = await Course.findById(courseId);
 
       const instructor = await InstructorClientService.getInstructorData(course.instructor);

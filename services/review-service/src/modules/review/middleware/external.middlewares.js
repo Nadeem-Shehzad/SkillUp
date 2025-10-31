@@ -1,55 +1,12 @@
 import mongoose from "mongoose";
+import axios from "axios";
 
 import { ApiError, constants } from "@skillup/common-utils";
 
-import { CourseClientService } from "../services/client/courseClient.service.js";
-import { EnrollmentClientService } from "../services/client/enrollmentClient.service.js";
-import { StudentClientService } from "../services/client/studentClient.service.js";
-import { InstructorClientService } from "../services/client/instructorClient.service.js";
+const ENROLLMENT_SERVICE_URL = "http://localhost:5000";
+const INSTRUCTOR_SERVICE_URL = "http://localhost:5000";
+const COURSE_SERVICE_URL = "http://localhost:5000";
 
-
-export const checkStudentExists = async (req, res, next) => {
-   try {
-      const studentId = req.user.id;
-      if (!mongoose.Types.ObjectId.isValid(studentId)) {
-         throw new ApiError(constants.VALIDATION_ERROR, 'Invalid Student ID!');
-      }
-
-      const student = await StudentClientService.checkStudentExists(studentId);
-      if (!student) {
-         throw new ApiError(constants.NOT_FOUND, 'Student not Found!');
-      }
-
-      req.userId = req.user.id;
-      req.user.id = student._id;
-      next();
-
-   } catch (error) {
-      next(error);
-   }
-}
-
-
-export const checkCourseExits = async (req, res, next) => {
-   try {
-      const courseId = req.params.courseId;
-
-      if (!mongoose.Types.ObjectId.isValid(courseId)) {
-         throw new ApiError(constants.VALIDATION_ERROR, 'Invalid Course ID!');
-      }
-
-      const exists = await CourseClientService.courseExists(courseId);
-      if (!exists) {
-         throw new ApiError(constants.NOT_FOUND, 'Course not Found!');
-      }
-
-      req.courseId = courseId;
-      next();
-
-   } catch (error) {
-      next(error);
-   }
-}
 
 
 export const checkEnrollment = async (req, res, next) => {
@@ -57,12 +14,9 @@ export const checkEnrollment = async (req, res, next) => {
       const studentId = req.user.id;
       const courseId = req.params.courseId;
 
-      if (!mongoose.Types.ObjectId.isValid(studentId) || !mongoose.Types.ObjectId.isValid(courseId)) {
-         throw new ApiError(constants.VALIDATION_ERROR, 'Invalid Student or Course ID!');
-      }
+      const { data: enroll } = await axios.post(`${ENROLLMENT_SERVICE_URL}/api/v1/public/enrollments/check-enrollment/${courseId}`, { studentId, courseId });
 
-      const exists = await EnrollmentClientService.checkEnrollment(studentId, courseId);
-      if (!exists) {
+      if (!enroll) {
          throw new ApiError(constants.NOT_FOUND, 'To leave a review, first enroll in this course!');
       }
 
@@ -81,7 +35,7 @@ export const checkInstructorExists = async (req, res, next) => {
          throw new ApiError(constants.VALIDATION_ERROR, 'Invalid Instructor ID!');
       }
 
-      const instructor = await InstructorClientService.checkInstructorExists(instructorId);
+      const { data: instructor } = await axios.get(`${INSTRUCTOR_SERVICE_URL}/api/v1/public/instructors/check/${instructorId}`);
       if (!instructor) {
          throw new ApiError(constants.NOT_FOUND, 'Instructor not Found!');
       }
@@ -102,7 +56,7 @@ export const checkReviewedInstructor = async (req, res, next) => {
          throw new ApiError(constants.VALIDATION_ERROR, 'Invalid Instructor ID!');
       }
 
-      const instructor = await InstructorClientService.checkInstructorExists(instructorId);
+      const { data: instructor } = await axios.get(`${INSTRUCTOR_SERVICE_URL}/api/v1/public/instructors/check/${instructorId}`);
       if (!instructor) {
          throw new ApiError(constants.NOT_FOUND, 'Instructor not Found!');
       }
@@ -120,7 +74,7 @@ export const enrolledWithInstructor = async (req, res, next) => {
       const studentId = req.user.id;
       const instructorId = req.params.instructorId;
 
-      const studentExists = await StudentClientService.enrolledWithInstructor(studentId, instructorId);
+      const { data: studentExists } = await axios.post(`${INSTRUCTOR_SERVICE_URL}/api/v1/public/students/check-enrollment`, { studentId, instructorId });
       if (!studentExists) {
          throw new ApiError(constants.FORBIDDEN, 'Sorry, you are not enrolled in any course of this instructor!');
       }
@@ -138,8 +92,8 @@ export const checkCourseOwner = async (req, res, next) => {
       const instructorId = req.user.id;
       const courseId = req.params.courseId;
 
-      const { instructor } = await CourseClientService.getCourseSummary(courseId);
-
+      const { data } = await axios.get(`${COURSE_SERVICE_URL}/api/v1/public/courses/summary/${courseId}`);
+      const { courseName, instructor } = data;  
       if (instructorId.toString() !== instructor._id.toString()) {
          throw new ApiError(constants.FORBIDDEN, `Access Denied: can't see other's course reviews!`);
       }

@@ -12,7 +12,6 @@ export const StudentPublicService = {
    },
 
    async studentExists(userId) {
-      logger.info(`---------> inside studentExists Function...`);
       return await Student.findOne({ user: userId });
    },
 

@@ -16,3 +16,18 @@ export const checkStudentExists = async (req, res, next) => {
       next(error);
    }
 }
+
+
+export const checkStudentEnrollment = async (req, res, next) => {
+
+   try {
+      const { studentId, instructorId } = req.body;
+
+      const user = await StudentPublicService.enrolledWithInstructor(studentId, instructorId);
+
+      return res.status(200).json(user);
+
+   } catch (error) {
+      next(error);
+   }
+}

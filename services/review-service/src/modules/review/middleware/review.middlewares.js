@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 
-import { ApiError, constants } from "@skillup/common-utils";
+import { ApiError, constants, logger } from "@skillup/common-utils";
 
 import { Review } from "../models/courseReview.model.js";
 import { InstructorReview } from "../models/instructorReview.model.js";
 
 
 export const isValidStudent = async (req, res, next) => {
-   const studentId = req.user.id;
+   //const studentId = req.user.id;
+   const studentId = req.userId;
    const reviewId = req.params.reviewId;
 
    if (!mongoose.Types.ObjectId.isValid(reviewId)) {
@@ -20,7 +21,7 @@ export const isValidStudent = async (req, res, next) => {
    }
 
    if (studentId.toString() !== review.studentId.toString()) {
-      throw new ApiError(constants.FORBIDDEN, 'Access Denied!');
+      throw new ApiError(constants.FORBIDDEN, 'Access Denied: as u r not owner of this review!');
    }
 
    req.courseId = review.courseId;

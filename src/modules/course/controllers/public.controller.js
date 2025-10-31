@@ -10,11 +10,20 @@ export const getCourseSummary = async (req, res, next) => {
          throw new ApiError(constants.NOT_FOUND, 'Either Course or Inst. data not found!');
       }
 
-      logger.info('inside public controller');
-      logger.info(`CourseName --> ${courseName}`);
-      logger.info(`Instructor --> ${instructor.name}`);
-
       return res.status(200).json({ courseName, instructor });
+
+   } catch (error) {
+      next(error);
+   }
+}
+
+
+export const checkCourseExits = async (req, res, next) => {
+   try {
+      const courseId = req.params.courseId;
+      const course = await CoursePublicService.courseExists(courseId);
+
+      return res.status(200).json(course);
 
    } catch (error) {
       next(error);
@@ -29,7 +38,6 @@ export const updateCourseRating = async (req, res, next) => {
 
       const course = await CoursePublicService.updateCourseRating(courseId, avgRating, totalReviews);
 
-      logger.warn(`<--- Rating updated --->`);
       return res.status(200).json({ course });
 
    } catch (error) {

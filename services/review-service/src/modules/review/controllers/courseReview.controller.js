@@ -1,39 +1,39 @@
 import mongoose from "mongoose";
 import {
    addReviewService,
-   // deleteReviewService,
-   // getCourseReviewsAnalyticsService,
-   // getCourseReviewsService,
-   // getMyCourseReviewsService,
+   deleteReviewService,
+   getCourseReviewsAnalyticsService,
+   getCourseReviewsService,
+   getMyCourseReviewsService,
    getMyReviewsService,
    getTopRatedCoursesService,
-   //updateReviewService
+   updateReviewService
 } from "../services/review.service.js";
 
 
 // public
-// export const getReviews = async (req, res, next) => {
-//    try {
-//       const courseId = req.courseId;
-//       const reviews = await getCourseReviewsService({ courseId });
+export const getReviews = async (req, res, next) => {
+   try {
+      const courseId = req.courseId;
+      const reviews = await getCourseReviewsService({ courseId });
 
-//       res.status(200).json({ success: true, message: 'Course Reviews.', data: reviews });
-//    } catch (error) {
-//       next(error);
-//    }
-// }
+      res.status(200).json({ success: true, message: 'Course Reviews.', data: reviews });
+   } catch (error) {
+      next(error);
+   }
+}
 
 
-// export const courseReviewsAnalytics = async (req, res, next) => {
-//    try {
-//       const courseId = req.courseId;
-//       const analytics = await getCourseReviewsAnalyticsService({ courseId });
+export const courseReviewsAnalytics = async (req, res, next) => {
+   try {
+      const courseId = req.courseId;
+      const analytics = await getCourseReviewsAnalyticsService({ courseId });
 
-//       res.status(200).json({ success: true, message: 'Course Reviews Analytics.', data: analytics });
-//    } catch (error) {
-//       next(error);
-//    }
-// }
+      res.status(200).json({ success: true, message: 'Course Reviews Analytics.', data: analytics });
+   } catch (error) {
+      next(error);
+   }
+}
 
 
 export const topRatedCourses = async (req, res, next) => {
@@ -68,33 +68,33 @@ export const addReview = async (req, res, next) => {
 }
 
 
-// export const updateReview = async (req, res, next) => {
-//    try {
-//       const reviewId = req.params.reviewId;
-//       const courseId = req.courseId;
-//       const dataToUpdate = req.body;
+export const updateReview = async (req, res, next) => {
+   try {
+      const reviewId = req.params.reviewId;
+      const courseId = req.courseId;
+      const dataToUpdate = req.body;
 
-//       const review = await updateReviewService({ reviewId, courseId, dataToUpdate });
+      const review = await updateReviewService({ reviewId, courseId, dataToUpdate });
 
-//       res.status(200).json({ success: true, message: 'review updated.', data: review });
-//    } catch (error) {
-//       next(error);
-//    }
-// }
+      res.status(200).json({ success: true, message: 'review updated.', data: review });
+   } catch (error) {
+      next(error);
+   }
+}
 
 
-// export const deleteReview = async (req, res, next) => {
-//    try {
-//       const reviewId = req.params.reviewId;
-//       const courseId = req.courseId;
+export const deleteReview = async (req, res, next) => {
+   try {
+      const reviewId = req.params.reviewId;
+      const courseId = req.courseId;
 
-//       const review = await deleteReviewService({ reviewId, courseId });
+      const review = await deleteReviewService({ reviewId, courseId });
 
-//       res.status(200).json({ success: true, message: 'review deleted.', data: null });
-//    } catch (error) {
-//       next(error);
-//    }
-// }
+      res.status(200).json({ success: true, message: 'review deleted.', data: null });
+   } catch (error) {
+      next(error);
+   }
+}
 
 
 export const myReviews = async (req, res, next) => {
@@ -112,32 +112,30 @@ export const myReviews = async (req, res, next) => {
 
 
 
-// // instructor
-// export const myCourseReviews = async (req, res, next) => {
-//    try {
-//       const courseId = req.courseId;
-//       const reviews = await getMyCourseReviewsService({ courseId });
+// instructor
+export const myCourseReviews = async (req, res, next) => {
+   try {
+      const courseId = req.courseId;
+      const reviews = await getMyCourseReviewsService({ courseId });
 
-//       res.status(200).json({ success: true, message: 'Your Course Reviews.', data: reviews });
-//    } catch (error) {
-//       next(error);
-//    }
-// }
-
-
+      res.status(200).json({ success: true, message: 'Your Course Reviews.', data: reviews });
+   } catch (error) {
+      next(error);
+   }
+}
 
 
 
-// // admin
-// export const admin_deleteReview = async (req, res, next) => {
-//    try {
-//       const reviewId = req.reviewId;
-//       const courseId = req.courseId;
+// admin
+export const admin_deleteReview = async (req, res, next) => {
+   try {
+      const reviewId = req.reviewId;
+      const courseId = req.courseId;
 
-//       const review = await deleteReviewService({ reviewId, courseId });
+      const review = await deleteReviewService({ reviewId, courseId });
 
-//       res.status(200).json({ success: true, message: 'admin: review deleted.', data: null });
-//    } catch (error) {
-//       next(error);
-//    }
-// }
+      res.status(200).json({ success: true, message: 'admin: review deleted.', data: null });
+   } catch (error) {
+      next(error);
+   }
+}
